@@ -459,7 +459,24 @@ function LanguageSelector({ onLanguageSelect }) {
     );
 }
 
-
+function HubBackground() {
+    // Убираем ВСЁ: requestAnimationFrame, mousemove, частицы
+    // Оставляем только статичный фон
+    
+    return (
+        <>
+            <div className="hub-background-wrapper hub-anim-fade-in">
+                <img 
+                    src="/bg.jpg" 
+                    className="hub-bg-image" 
+                    alt="background" 
+                    loading="lazy"
+                />
+                <div className="hub-vignette"></div>
+            </div>
+        </>
+    );
+}
 
 function HubApp({ t, currentLang, setCurrentLang }) {
     const [page, setPage] = useState('home');
