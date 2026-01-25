@@ -9,12 +9,6 @@ const HUB_PARTICLES = [...Array(25)].map(() => ({
     size: 3 + Math.random() * 5
 }));
 
-const BASE_PARTICLES = [...Array(35)].map(() => ({
-    left: Math.random() * 100,
-    delay: Math.random() * 5,
-    duration: 10 + Math.random() * 10,
-    size: 4 + Math.random() * 6
-}));
 
 const AVATAR = "/QXbbs7jJ_400x400.jpg";
 const MB_LOGO = "/stEObS-j_400x400.jpg";
@@ -465,62 +459,7 @@ function LanguageSelector({ onLanguageSelect }) {
     );
 }
 
-function HubBackground() {
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [passiveOffset, setPassiveOffset] = useState({ x: 0, y: 0 });
-    const requestRef = useRef();
-    const timeRef = useRef(0);
 
-    useEffect(() => {
-        const animate = () => {
-            timeRef.current += 0.003;
-            setPassiveOffset({
-                x: Math.sin(timeRef.current) * 5,
-                y: Math.cos(timeRef.current * 0.5) * 4
-            });
-            requestRef.current = requestAnimationFrame(animate);
-        };
-        requestRef.current = requestAnimationFrame(animate);
-        return () => cancelAnimationFrame(requestRef.current);
-    }, []);
-
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            setMousePos({
-                x: (e.clientX / window.innerWidth - 0.5) * 8,
-                y: (e.clientY / window.innerHeight - 0.5) * 8
-            });
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
-
-    return (
-        <>
-            <div
-                className="hub-background-wrapper hub-anim-fade-in"
-                style={{
-                    transform: `scale(1.05) translate3d(${mousePos.x + passiveOffset.x}px, ${mousePos.y + passiveOffset.y}px, 0)`,
-                }}
-            >
-                <img src="/bg.jpg" className="hub-bg-image" alt="background" />
-                <div className="hub-vignette"></div>
-            </div>
-
-            <div className="particles-container">
-                {HUB_PARTICLES.map((p, i) => (
-                    <div key={i} className="hub-particle leaf" style={{
-                        left: `${p.left}%`,
-                        width: `${p.size}px`,
-                        height: `${p.size * 0.6}px`,
-                        animationDelay: `${p.delay}s`,
-                        animationDuration: `${p.duration}s`
-                    }} />
-                ))}
-            </div>
-        </>
-    );
-}
 
 function HubApp({ t, currentLang, setCurrentLang }) {
     const [page, setPage] = useState('home');
