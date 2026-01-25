@@ -861,8 +861,8 @@ const CommunityPage = ({ t }) => {
             emoji: "🎮",
             title: "Game Creation Challenge",
             description: "Создай любую крутую игру, выложи в Twitter с тегами @magicblock и @himas.somi. Автор обязательно поддержит тебя! Пример игры от автора — Magic Jumper.",
-            image: "challenges/game-creation.jpg",
-            authorAvatars: ["avatars/himas.jpg"],
+            image: "magichub/challenges/game-creation.jpg",
+            authorAvatars: ["magichub/avatars/himas.jpg"],
             authorNames: ["@himas.somi"],
             tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
             hashtags: ["#MagicBlock", "#GameDev"]
@@ -872,8 +872,8 @@ const CommunityPage = ({ t }) => {
             emoji: "🎨",
             title: "Half-Wizard Challenge",
             description: "Волшебник обрёл себя с MagicBlock! Нарисуй продолжение истории, добавь текст 'Life After MagicBlock' к своему арту и сделай quote retweet поста авторов.",
-            image: "challenges/half-wizard.jpg",
-            authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
+            image: "magichub/challenges/half-wizard.jpg",
+            authorAvatars: ["magichub/avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
             authorNames: ["@wtf4uk", "@Yurii_week"],
             tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
             hashtags: ["#MagicBlock", "#ArtChallenge"]
@@ -883,8 +883,8 @@ const CommunityPage = ({ t }) => {
             emoji: "📖",
             title: "Secret Participant Diary",
             description: "Garbar запускает челлендж 'Тайный дневник участника MagicBlock'. Напиши автору в личные сообщения для персонального дневника.",
-            image: "challenges/secret-diary.jpg",
-            authorAvatars: ["avatars/garbar.jpg"],
+            image: "magichub/challenges/secret-diary.jpg",
+            authorAvatars: ["magichub/avatars/garbar.jpg"],
             authorNames: ["Garbar"],
             tweetLink: "https://x.com/garbar27/status/2011697269150793862",
             hashtags: ["#MagicBlock", "#Community"]
