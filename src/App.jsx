@@ -1,5 +1,4 @@
 ﻿import React, { useEffect, useState, useRef } from 'react';
-import './styles/base-styles.css';
 import './styles/hub-styles.css';
 
 const HUB_PARTICLES = [...Array(25)].map(() => ({
