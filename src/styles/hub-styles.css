@@ -1044,6 +1044,58 @@ body {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
+/* ===== COMMUNITY SECTION HEADERS ===== */
+.section-header {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.section-title {
+    color: var(--primary-magic);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.title-icon {
+    font-size: 1.8rem;
+}
+
+.title-badge {
+    background: linear-gradient(135deg, #8B5CF6, #06B6D4);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-left: 10px;
+    white-space: nowrap;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.section-description {
+    background: rgba(184, 217, 114, 0.1);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border-left: 3px solid #B8D972;
+    color: #B8D972;
+    font-size: 1.05em;
+    line-height: 1.6;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.section-description p {
+    margin: 0;
+    font-weight: 500;
+}
 .section-switcher {
     display: flex;
     gap: 15px;
@@ -4168,5 +4220,138 @@ body {
 
     to {
         box-shadow: 0 0 30px var(--primary-magic), 0 0 20px var(--accent-purple), inset 0 0 12px rgba(139, 92, 246, 0.2);
+    }
+}
+/* ===== ВОЗВРАЩЁННЫЕ BLUR ЭФФЕКТЫ ДЛЯ ДИЗАЙНА ===== */
+
+/* Фон хаб-страницы - лёгкий blur */
+.hub-background-wrapper {
+    filter: blur(6px) brightness(0.8);
+}
+
+/* Навбар - стеклянный эффект */
+.navbar {
+    backdrop-filter: blur(15px);
+}
+
+/* Языковой селектор при запуске */
+.lang-selector-overlay {
+    backdrop-filter: blur(20px);
+}
+
+.lang-selector {
+    backdrop-filter: blur(10px);
+}
+
+.lang-button {
+    backdrop-filter: blur(10px);
+}
+
+/* Переключатель языка в хабе */
+.lang-switcher {
+    backdrop-filter: blur(10px);
+}
+
+/* Карточки - лёгкое стекло */
+.intro-card, 
+.video-card, 
+.card, 
+.project-section,
+.challenge-card,
+.event-card,
+.news-card,
+.about-section, 
+.contact-card, 
+.media-card,
+.quiz-cta-card,
+.quiz-card,
+.result-header,
+.certificate-form,
+.certificate-display {
+    backdrop-filter: blur(10px);
+}
+
+/* Футер и информационные блоки */
+.footer, 
+.news-subscribe, 
+.quick-links,
+.section-switcher-container,
+.no-new-events-notice,
+.events-schedule-info,
+.events-footer-note {
+    backdrop-filter: blur(10px);
+}
+
+/* Модальные окна */
+.game-modal {
+    backdrop-filter: blur(15px);
+}
+
+.game-modal-content {
+    backdrop-filter: blur(10px);
+}
+
+/* Секции медиа */
+.media-section,
+.category-header {
+    backdrop-filter: blur(12px);
+}
+
+/* Ховер-эффекты для карточек (лёгкие) */
+.card:hover,
+.challenge-card:hover,
+.event-card:hover,
+.news-card:hover {
+    backdrop-filter: blur(8px);
+}
+
+/* Аватары в челленджах */
+.author-avatar {
+    backdrop-filter: blur(2px);
+}
+
+/* Бейджи статусов */
+.news-badge,
+.event-status {
+    backdrop-filter: blur(4px);
+}
+
+/* Плавное включение blur для слабых устройств */
+@media (prefers-reduced-motion: reduce) {
+    .navbar,
+    .lang-selector-overlay,
+    .lang-switcher,
+    .intro-card,
+    .video-card,
+    .card,
+    .footer {
+        backdrop-filter: blur(5px);
+    }
+}
+
+/* Отключение blur для очень слабых GPU */
+@media (max-width: 768px) {
+    .hub-background-wrapper {
+        filter: blur(3px) brightness(0.8);
+    }
+    
+    .navbar,
+    .lang-switcher {
+        backdrop-filter: blur(8px);
+    }
+}
+
+@media (max-width: 480px) {
+    .hub-background-wrapper {
+        filter: blur(2px) brightness(0.8);
+    }
+    
+    /* На мобилках можно уменьшить или убрать blur */
+    .navbar {
+        backdrop-filter: blur(5px);
+    }
+    
+    .lang-switcher {
+        backdrop-filter: none;
     }
 }
