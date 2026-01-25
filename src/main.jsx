@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 
-import './styles/base-styles.css'
+
 import './styles/hub-styles.css'
 
 createRoot(document.getElementById('root')).render(
