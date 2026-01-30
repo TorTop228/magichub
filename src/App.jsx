@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState} from 'react';
 import './styles/hub-styles.css';
 
 const HUB_PARTICLES = [...Array(25)].map(() => ({
@@ -461,14 +461,14 @@ function LanguageSelector({ onLanguageSelect }) {
 function HubBackground() {
     // Убираем ВСЁ: requestAnimationFrame, mousemove, частицы
     // Оставляем только статичный фон
-    
+
     return (
         <>
             <div className="hub-background-wrapper hub-anim-fade-in">
-                <img 
-                    src="/bg.jpg" 
-                    className="hub-bg-image" 
-                    alt="background" 
+                <img
+                    src="/bg.jpg"
+                    className="hub-bg-image"
+                    alt="background"
                     loading="lazy"
                 />
                 <div className="hub-vignette"></div>
@@ -745,48 +745,7 @@ const CommunityPage = ({ t }) => {
     const community = t.communityPage;
     const [activeSection, setActiveSection] = useState('challenges');
 
-    const getNextEventDate = (baseDate, frequency) => {
-        const now = new Date();
-        const eventDate = new Date(baseDate);
-
-        let nextDate = new Date(eventDate);
-
-        if (frequency === 'daily') {
-            while (nextDate <= now || nextDate.getDay() === 0 || nextDate.getDay() === 6) {
-                nextDate.setDate(nextDate.getDate() + 1);
-            }
-            nextDate.setHours(eventDate.getHours(), eventDate.getMinutes(), 0, 0);
-        } else if (frequency === 'weekly') {
-            const targetDay = eventDate.getDay();
-            const today = now.getDay();
-
-            let daysToAdd = targetDay - today;
-            if (daysToAdd <= 0 || (daysToAdd === 0 && eventDate.getTime() <= now.getTime())) {
-                daysToAdd += 7;
-            }
-
-            nextDate = new Date(now);
-            nextDate.setDate(now.getDate() + daysToAdd);
-            nextDate.setHours(eventDate.getHours(), eventDate.getMinutes(), 0, 0);
-        } else if (frequency === 'biweekly') {
-            nextDate = new Date(eventDate);
-            while (nextDate <= now) {
-                nextDate.setDate(nextDate.getDate() + 14);
-            }
-        } else if (frequency === 'monthly') {
-            nextDate = new Date(eventDate);
-            while (nextDate <= now) {
-                nextDate.setMonth(nextDate.getMonth() + 1);
-                const firstDay = new Date(nextDate.getFullYear(), nextDate.getMonth(), 1);
-                let daysToAdd = (4 - firstDay.getDay() + 7) % 7;
-                if (daysToAdd === 0) daysToAdd = 7;
-                nextDate.setDate(1 + daysToAdd);
-                nextDate.setHours(eventDate.getHours(), eventDate.getMinutes(), 0, 0);
-            }
-        }
-
-        return nextDate;
-    };
+   
 
     const formatEventDate = (dateObj) => {
         const isRussian = t.communityPage.title === "Сообщество";
@@ -811,228 +770,331 @@ const CommunityPage = ({ t }) => {
     };
 
     const challenges = t.communityPage.title === "Сообщество" ? [
-        {
-            id: 1,
-            emoji: "🎮",
-            title: "Game Creation Challenge",
-            description: "Создай любую крутую игру, выложи в Twitter с тегами @magicblock и @himas.somi. Автор обязательно поддержит тебя! Пример игры от автора — Magic Jumper.",
-            image: "challenges/game-creation.webp",
-            authorAvatars: ["avatars/himas.jpg"],
-            authorNames: ["@himas.somi"],
-            tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
-            hashtags: ["#MagicBlock", "#GameDev"]
-        },
-        {
-            id: 2,
-            emoji: "🎨",
-            title: "Half-Wizard Challenge",
-            description: "Волшебник обрёл себя с MagicBlock! Нарисуй продолжение истории, добавь текст 'Life After MagicBlock' к своему арту и сделай quote retweet поста авторов.",
-            image: "challenges/half-wizard.webp",
-            authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
-            authorNames: ["@wtf4uk", "@Yurii_week"],
-            tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
-            hashtags: ["#MagicBlock", "#ArtChallenge"]
-        },
-        {
-            id: 3,
-            emoji: "📖",
-            title: "Secret Participant Diary",
-            description: "Garbar запускает челлендж 'Тайный дневник участника MagicBlock'. Напиши автору в личные сообщения для персонального дневника.",
-            image: "challenges/secret-diary.webp",
-            authorAvatars: ["avatars/garbar.jpg"],
-            authorNames: ["Garbar"],
-            tweetLink: "https://x.com/garbar27/status/2011697269150793862",
-            hashtags: ["#MagicBlock", "#Community"]
-        },
-        {
-            id: 4,
-            emoji: "🧙‍♂️",
-            title: "The Wizard's Ephemeral Block",
-            description: "Продолжи историю волшебника, который смог прикоснуться к таинственному эфемерному блоку. Покажи, какие двери открылись для него.",
-            image: "challenges/wizards-block.webp",
-            authorAvatars: ["avatars/saiho.jpg"],
-            authorNames: ["Saiho"],
-            tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
-            hashtags: ["#MagicBlock", "#Storytelling"]
-        },
-        {
-            id: 5,
-            emoji: "📸",
-            title: "Random Picture with Magic",
-            description: "Выбери случайное фото из галереи, объясни что ты делаешь, добавь магического маскота. Пример от автора: 'Пытался впервые научиться сноубордингу'.",
-            image: "challenges/random-photo.webp",
-            authorAvatars: ["avatars/cryptoshi.jpg"],
-            authorNames: ["Cryptoshi | Bulk"],
-            tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
-            hashtags: ["#MagicBlock", "#PhotoChallenge"]
-        },
-        {
-            id: 6,
-            emoji: "🧙‍♂️",
-            title: "Build Your Wizard Challenge",
-            description: "Собери своего уникального Волшебника! Добавь 4 магических предмета к шаблону, объясни их значение в твите.",
-            image: "challenges/build-wizard.webp",
-            authorAvatars: ["avatars/crypto-viktor.jpg"],
-            authorNames: ["Crypto Viktor"],
-            tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
-            hashtags: ["#MagicBlock", "#WizardChallenge"]
-        },
-        {
-            id: 7,
-            emoji: "🏆",
-            title: "Community Certificate Challenge",
-            description: "Я создал сертификат для сообщества MagicBlock, который покажет вашу преданность. Однако вам также нужно будет ответить на 3 вопроса викторины, на которые смогут правильно ответить только самые преданные участники сообщества.",
-            image: "challenges/pfp-generatorr.webp",
-            authorAvatars: ["avatars/garbar.jpg"],
-            authorNames: ["Garbar"],
-            tweetLink: "https://x.com/garbar27/status/2013172329266758023",
-            hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
-            specialNote: "Ссылка на викторину: https://community-certificate-vercel.vercel.app",
-            requirements: [
-                "Пройти викторину из 3 вопросов",
-                "Ответить правильно на все вопросы",
-                "Получить персонализированный сертификат",
-                "Поделиться результатом в Twitter"
-            ],
-            prize: "Эксклюзивный цифровой сертификат + роль в Discord"
-        },
-        {
-            id: 8,
-            emoji: "✨",
-            title: "MagicBlock Profile Picture Generator",
-            description: "Мы с @0xCryptoViktor_ создали сайт, где можно создавать аватары в стиле MagicBlock. Попробуйте и поделитесь своим фидбеком!",
-            image: "challenges/pfp-generator.webp",
-            authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
-            authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
-            tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
-            specialNote: "https://magicblock-pfp-generator.netlify.app",
-            hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"],
-            requirements: [
-                "Создать аватарку на сайте",
-                "Экспортировать в высоком качестве",
-                "Установить как аватар в соцсетях",
-                "Поделиться скриншотом в Twitter"
-            ],
-            features: [
-                "Кастомизация волос, глаз, аксессуаров",
-                "Магические эффекты и свечения",
-                "NFT-стиль с элементами MagicBlock",
-                "Бесплатный экспорт в PNG/SVG"
-            ]
-        }
-    ] : [
-        {
-            id: 1,
-            emoji: "🎮",
-            title: "Game Creation Challenge",
-            description: "Create any cool game, post it on Twitter with tags @magicblock and @himas.somi. The author will definitely support you! Author's example game is Magic Jumper.",
-            image: "challenges/game-creation.webp",
-            authorAvatars: ["avatars/himas.jpg"],
-            authorNames: ["@himas.somi"],
-            tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
-            hashtags: ["#MagicBlock", "#GameDev"]
-        },
-        {
-            id: 2,
-            emoji: "🎨",
-            title: "Half-Wizard Challenge",
-            description: "The wizard found himself with MagicBlock! Draw a continuation of the story, add the text 'Life After MagicBlock' to your art and make a quote retweet of the authors' post.",
-            image: "challenges/half-wizard.webp",
-            authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
-            authorNames: ["@wtf4uk", "@Yurii_week"],
-            tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
-            hashtags: ["#MagicBlock", "#ArtChallenge"]
-        },
-        {
-            id: 3,
-            emoji: "📖",
-            title: "Secret Participant Diary",
-            description: "Garbar launches the 'Secret Diary of a MagicBlock Participant' challenge. Write to the author in private messages for a personal diary.",
-            image: "challenges/secret-diary.webp",
-            authorAvatars: ["avatars/garbar.jpg"],
-            authorNames: ["Garbar"],
-            tweetLink: "https://x.com/garbar27/status/2011697269150793862",
-            hashtags: ["#MagicBlock", "#Community"]
-        },
-        {
-            id: 4,
-            emoji: "🧙‍♂️",
-            title: "The Wizard's Ephemeral Block",
-            description: "Continue the story of a wizard who was able to touch a mysterious ephemeral block. Show what doors have opened for him.",
-            image: "challenges/wizards-block.webp",
-            authorAvatars: ["avatars/saiho.jpg"],
-            authorNames: ["Saiho"],
-            tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
-            hashtags: ["#MagicBlock", "#Storytelling"]
-        },
-        {
-            id: 5,
-            emoji: "📸",
-            title: "Random Picture with Magic",
-            description: "Choose a random photo from the gallery, explain what you are doing, add a magical mascot. Example from the author: 'Tried to learn snowboarding for the first time'.",
-            image: "challenges/random-photo.webp",
-            authorAvatars: ["avatars/cryptoshi.jpg"],
-            authorNames: ["Cryptoshi | Bulk"],
-            tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
-            hashtags: ["#MagicBlock", "#PhotoChallenge"]
-        },
-        {
-            id: 6,
-            emoji: "🧙‍♂️",
-            title: "Build Your Wizard Challenge",
-            description: "Build your unique Wizard! Add 4 magical items to the template, explain their meaning in a tweet.",
-            image: "challenges/build-wizard.webp",
-            authorAvatars: ["avatars/crypto-viktor.jpg"],
-            authorNames: ["Crypto Viktor"],
-            tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
-            hashtags: ["#MagicBlock", "#WizardChallenge"]
-        },
-        {
-            id: 7,
-            emoji: "🏆",
-            title: "Community Certificate Challenge",
-            description: "I have created a certificate for the MagicBlock community that will show your dedication. However, you will also need to answer 3 quiz questions that only the most dedicated members of the community will be able to answer correctly.",
-            image: "challenges/pfp-generatorr.webp",
-            authorAvatars: ["avatars/garbar.jpg"],
-            authorNames: ["Garbar"],
-            tweetLink: "https://x.com/garbar27/status/2013172329266758023",
-            hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
-            specialNote: "Quiz link: https://community-certificate-vercel.vercel.app",
-            requirements: [
-                "Complete the 3-question quiz",
-                "Answer all questions correctly",
-                "Receive a personalized certificate",
-                "Share the result on Twitter"
-            ],
-            prize: "Exclusive digital certificate + Discord role"
-        },
-        {
-            id: 8,
-            emoji: "✨",
-            title: "MagicBlock Profile Picture Generator",
-            description: "We built a website with @0xCryptoViktor_ where you can create MagicBlock-style profile pictures. Try it out and share your feedback!",
-            image: "challenges/pfp-generator.webp",
-            authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
-            authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
-            tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
-            specialNote: "https://magicblock-pfp-generator.netlify.app",
-            hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"],
-            requirements: [
-                "Create an avatar on the website",
-                "Export in high quality",
-                "Set as avatar on social media",
-                "Share screenshot on Twitter"
-            ],
-            features: [
-                "Customizable hair, eyes, accessories",
-                "Magic effects and glows",
-                "NFT-style with MagicBlock elements",
-                "Free export in PNG/SVG"
-            ]
-        }
-    ];
+    // НОВЫЕ ЧЕЛЛЕНДЖИ - ДОБАВЛЕНЫ В НАЧАЛО
+    {
+        id: 9,
+        emoji: "🎯",
+        title: "BINGO Challenge",
+        description: "Я организую новый челлендж на @magicblock под названием BINGO! Ваша задача - внимательно прочитать каждую ячейку и либо отметить ее галочкой, либо вычеркнуть, а также процитировать этот пост и поделиться своими результатами. Вы можете заметить, что некоторые ячейки легко понять, а другие предназначены для тех, кто действительно погружен в мир магии и волшебства #magicblock. Давайте посмотрим, насколько вы настоящий волшебник! 🧙‍♂️",
+        image: "challenges/bingo.jpg",
+        authorAvatars: ["avatars/weeklang.jpg"],
+        authorNames: ["Weeklang (@Yurii_week)"],
+        tweetLink: "https://x.com/Yurii_week/status/2014632100223594522",
+        hashtags: ["#MagicBlock", "#BINGO", "#Challenge"] // ДОБАВЛЕНО
+    },
+    {
+        id: 10,
+        emoji: "🎨",
+        title: "Dota 2 Art Challenge",
+        description: "gMagic друзья! Я запускаю челлендж, где вам нужно нарисовать арт, связанный с вашей любимой игрой. Моя любимая игра - Dota 2, поэтому волшебник играет в нее. С нетерпением жду ваших работ!",
+        image: "challenges/dota-art.jpg",
+        authorAvatars: ["avatars/l1ndlee.jpg"],
+        authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
+        tweetLink: "https://x.com/l1ndlee/status/2014527891788062715",
+        hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
+    },
+    {
+        id: 11,
+        emoji: "🏆",
+        title: "Achievements Showcase Challenge",
+        description: "Покажи свои достижения в @magicblock. Процитируй мой пост и отметь галочками пункты, где выполнены ваши баллы 🔥",
+        image: "challenges/achievements.jpg",
+        authorAvatars: ["avatars/bogdan.jpg"],
+        authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
+        tweetLink: "https://x.com/absBogdan/status/2014498005682057261",
+        hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
+    },
+    {
+        id: 12,
+        emoji: "🔍",
+        title: "The Muggle Hunt",
+        description: "Запускаю новый челлендж - The Muggle Hunt✨ Если вы, как и я, любите атмосферу Гарри Поттера, то это для вас🪄 Что нужно сделать: напишите мне в личные сообщения, используйте слово Muggle, чтобы получить свою карточку с фото разыскиваемого. Опубликуйте ее и напишите краткое описание того, что вам больше всего нравится в фильмах о Гарри Поттере. Поделитесь мыслями о том, как магия из фильма может быть связана с MagicBlock. Не забудьте процитировать ретвит этого поста💜 Давайте найдем всех маглов вместе👀",
+        image: "challenges/muggle-hunt.jpg",
+        authorAvatars: ["avatars/garbar.jpg"],
+        authorNames: ["Garbar (@garbar27)"],
+        tweetLink: "https://x.com/garbar27/status/2014395262808457221",
+        hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
+    },
+    {
+        id: 1,
+        emoji: "🎮",
+        title: "Game Creation Challenge",
+        description: "Создай любую крутую игру, выложи в Twitter с тегами @magicblock и @himas.somi. Автор обязательно поддержит тебя! Пример игры от автора — Magic Jumper.",
+        image: "challenges/game-creation.webp",
+        authorAvatars: ["avatars/himas.jpg"],
+        authorNames: ["@himas.somi"],
+        tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
+        hashtags: ["#MagicBlock", "#GameDev"]
+    },
+    {
+        id: 2,
+        emoji: "🎨",
+        title: "Half-Wizard Challenge",
+        description: "Волшебник обрёл себя с MagicBlock! Нарисуй продолжение истории, добавь текст 'Life After MagicBlock' к своему арту и сделай quote retweet поста авторов.",
+        image: "challenges/half-wizard.webp",
+        authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
+        authorNames: ["@wtf4uk", "@Yurii_week"],
+        tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
+        hashtags: ["#MagicBlock", "#ArtChallenge"]
+    },
+    {
+        id: 3,
+        emoji: "📖",
+        title: "Secret Participant Diary",
+        description: "Garbar запускает челлендж 'Тайный дневник участника MagicBlock'. Напиши автору в личные сообщения для персонального дневника.",
+        image: "challenges/secret-diary.webp",
+        authorAvatars: ["avatars/garbar.jpg"],
+        authorNames: ["Garbar"],
+        tweetLink: "https://x.com/garbar27/status/2011697269150793862",
+        hashtags: ["#MagicBlock", "#Community"]
+    },
+    {
+        id: 4,
+        emoji: "🧙‍♂️",
+        title: "The Wizard's Ephemeral Block",
+        description: "Продолжи историю волшебника, который смог прикоснуться к таинственному эфемерному блоку. Покажи, какие двери открылись для него.",
+        image: "challenges/wizards-block.webp",
+        authorAvatars: ["avatars/saiho.jpg"],
+        authorNames: ["Saiho"],
+        tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
+        hashtags: ["#MagicBlock", "#Storytelling"]
+    },
+    {
+        id: 5,
+        emoji: "📸",
+        title: "Random Picture with Magic",
+        description: "Выбери случайное фото из галереи, объясни что ты делаешь, добавь магического маскота. Пример от автора: 'Пытался впервые научиться сноубордингу'.",
+        image: "challenges/random-photo.webp",
+        authorAvatars: ["avatars/cryptoshi.jpg"],
+        authorNames: ["Cryptoshi | Bulk"],
+        tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
+        hashtags: ["#MagicBlock", "#PhotoChallenge"]
+    },
+    {
+        id: 6,
+        emoji: "🧙‍♂️",
+        title: "Build Your Wizard Challenge",
+        description: "Собери своего уникального Волшебника! Добавь 4 магических предмета к шаблону, объясни их значение в твите.",
+        image: "challenges/build-wizard.webp",
+        authorAvatars: ["avatars/crypto-viktor.jpg"],
+        authorNames: ["Crypto Viktor"],
+        tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
+        hashtags: ["#MagicBlock", "#WizardChallenge"]
+    },
+    {
+        id: 7,
+        emoji: "🏆",
+        title: "Community Certificate Challenge",
+        description: "Я создал сертификат для сообщества MagicBlock, который покажет вашу преданность. Однако вам также нужно будет ответить на 3 вопроса викторины, на которые смогут правильно ответить только самые преданные участники сообщества.",
+        image: "challenges/pfp-generatorr.webp",
+        authorAvatars: ["avatars/garbar.jpg"],
+        authorNames: ["Garbar"],
+        tweetLink: "https://x.com/garbar27/status/2013172329266758023",
+        hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
+        specialNote: "Ссылка на викторину: https://community-certificate-vercel.vercel.app",
+        requirements: [
+            "Пройти викторину из 3 вопросов",
+            "Ответить правильно на все вопросы",
+            "Получить персонализированный сертификат",
+            "Поделиться результатом в Twitter"
+        ],
+        prize: "Эксклюзивный цифровой сертификат + роль в Discord"
+    },
+    {
+        id: 8,
+        emoji: "✨",
+        title: "MagicBlock Profile Picture Generator",
+        description: "Мы с @0xCryptoViktor_ создали сайт, где можно создавать аватары в стиле MagicBlock. Попробуйте и поделитесь своим фидбеком!",
+        image: "challenges/pfp-generator.webp",
+        authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
+        authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
+        tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
+        specialNote: "https://magicblock-pfp-generator.netlify.app",
+        hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"],
+        requirements: [
+            "Создать аватарку на сайте",
+            "Экспортировать в высоком качестве",
+            "Установить как аватар в соцсетях",
+            "Поделиться скриншотом в Twitter"
+        ],
+        features: [
+            "Кастомизация волос, глаз, аксессуаров",
+            "Магические эффекты и свечения",
+            "NFT-стиль с элементами MagicBlock",
+            "Бесплатный экспорт в PNG/SVG"
+        ]
+    }
+] : [
+    // АНГЛИЙСКАЯ ВЕРСИЯ
+    {
+        id: 9,
+        emoji: "🎯",
+        title: "BINGO Challenge",
+        description: "I'm organizing a new challenge on @magicblock called BINGO! Your task is to carefully read each cell and either check it off or cross it out, and also quote this post and share your results. You may notice that some cells are easy to understand, while others are designed for those who are truly immersed in the world of magic and wizardry #magicblock. Let's see how much of a true wizard you are! 🧙‍♂️",
+        image: "challenges/bingo.jpg",
+        authorAvatars: ["avatars/weeklang.jpg"],
+        authorNames: ["Weeklang (@Yurii_week)"],
+        tweetLink: "https://x.com/Yurii_week/status/2014632100223594522",
+        hashtags: ["#MagicBlock", "#BINGO", "#Challenge"]
+    },
+    {
+        id: 10,
+        emoji: "🎨",
+        title: "Dota 2 Art Challenge",
+        description: "gMagic folks! I'm launching a challenge where you'll need to draw art related to your favorite game. My favorite game is Dota 2, so wizard is playing it. I look forward to seeing your work!",
+        image: "challenges/dota-art.jpg",
+        authorAvatars: ["avatars/l1ndlee.jpg"],
+        authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
+        tweetLink: "https://x.com/l1ndlee/status/2014527891788062715",
+        hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
+    },
+    {
+        id: 11,
+        emoji: "🏆",
+        title: "Achievements Showcase Challenge",
+        description: "Show off your achievements in @magicblock. Quote my post and tick the boxes where your points are fulfilled 🔥",
+        image: "challenges/achievements.jpg",
+        authorAvatars: ["avatars/bogdan.jpg"],
+        authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
+        tweetLink: "https://x.com/absBogdan/status/2014498005682057261",
+        hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
+    },
+    {
+        id: 12,
+        emoji: "🔍",
+        title: "The Muggle Hunt",
+        description: "I'm launching a new challenge - The Muggle Hunt✨ If, like me, you love the atmosphere of Harry Potter, then this is for you🪄 What you need to do: DM me, use the word Muggle to get your Wanted photo card. Post it and write a short description of what you like most about the Harry Potter films. Share your thoughts on how the magic from the film can be related to MagicBlock. Don't forget to quote retweet to this post💜 Let's find all the Muggles together👀",
+        image: "challenges/muggle-hunt.jpg",
+        authorAvatars: ["avatars/garbar.jpg"],
+        authorNames: ["Garbar (@garbar27)"],
+        tweetLink: "https://x.com/garbar27/status/2014395262808457221",
+        hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
+    },
+    {
+        id: 1,
+        emoji: "🎮",
+        title: "Game Creation Challenge",
+        description: "Create any cool game, post it on Twitter with tags @magicblock and @himas.somi. The author will definitely support you! Author's example game is Magic Jumper.",
+        image: "challenges/game-creation.webp",
+        authorAvatars: ["avatars/himas.jpg"],
+        authorNames: ["@himas.somi"],
+        tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
+        hashtags: ["#MagicBlock", "#GameDev"]
+    },
+    {
+        id: 2,
+        emoji: "🎨",
+        title: "Half-Wizard Challenge",
+        description: "The wizard found himself with MagicBlock! Draw a continuation of the story, add the text 'Life After MagicBlock' to your art and make a quote retweet of the authors' post.",
+        image: "challenges/half-wizard.webp",
+        authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
+        authorNames: ["@wtf4uk", "@Yurii_week"],
+        tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
+        hashtags: ["#MagicBlock", "#ArtChallenge"]
+    },
+    {
+        id: 3,
+        emoji: "📖",
+        title: "Secret Participant Diary",
+        description: "Garbar launches the 'Secret Diary of a MagicBlock Participant' challenge. Write to the author in private messages for a personal diary.",
+        image: "challenges/secret-diary.webp",
+        authorAvatars: ["avatars/garbar.jpg"],
+        authorNames: ["Garbar"],
+        tweetLink: "https://x.com/garbar27/status/2011697269150793862",
+        hashtags: ["#MagicBlock", "#Community"]
+    },
+    {
+        id: 4,
+        emoji: "🧙‍♂️",
+        title: "The Wizard's Ephemeral Block",
+        description: "Continue the story of a wizard who was able to touch a mysterious ephemeral block. Show what doors have opened for him.",
+        image: "challenges/wizards-block.webp",
+        authorAvatars: ["avatars/saiho.jpg"],
+        authorNames: ["Saiho"],
+        tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
+        hashtags: ["#MagicBlock", "#Storytelling"]
+    },
+    {
+        id: 5,
+        emoji: "📸",
+        title: "Random Picture with Magic",
+        description: "Choose a random photo from the gallery, explain what you are doing, add a magical mascot. Example from the author: 'Tried to learn snowboarding for the first time'.",
+        image: "challenges/random-photo.webp",
+        authorAvatars: ["avatars/cryptoshi.jpg"],
+        authorNames: ["Cryptoshi | Bulk"],
+        tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
+        hashtags: ["#MagicBlock", "#PhotoChallenge"]
+    },
+    {
+        id: 6,
+        emoji: "🧙‍♂️",
+        title: "Build Your Wizard Challenge",
+        description: "Build your unique Wizard! Add 4 magical items to the template, explain their meaning in a tweet.",
+        image: "challenges/build-wizard.webp",
+        authorAvatars: ["avatars/crypto-viktor.jpg"],
+        authorNames: ["Crypto Viktor"],
+        tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
+        hashtags: ["#MagicBlock", "#WizardChallenge"]
+    },
+    {
+        id: 7,
+        emoji: "🏆",
+        title: "Community Certificate Challenge",
+        description: "I have created a certificate for the MagicBlock community that will show your dedication. However, you will also need to answer 3 quiz questions that only the most dedicated members of the community will be able to answer correctly.",
+        image: "challenges/pfp-generatorr.webp",
+        authorAvatars: ["avatars/garbar.jpg"],
+        authorNames: ["Garbar"],
+        tweetLink: "https://x.com/garbar27/status/2013172329266758023",
+        hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
+        specialNote: "Quiz link: https://community-certificate-vercel.vercel.app"
+    },
+    {
+        id: 8,
+        emoji: "✨",
+        title: "MagicBlock Profile Picture Generator",
+        description: "We built a website with @0xCryptoViktor_ where you can create MagicBlock-style profile pictures. Try it out and share your feedback!",
+        image: "challenges/pfp-generator.webp",
+        authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
+        authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
+        tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
+        specialNote: "https://magicblock-pfp-generator.netlify.app",
+        hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"]
+    }
+];
 
     const eventTemplates = t.communityPage.title === "Сообщество" ? [
+
+        {
+            id: 8,
+            emoji: "♟️",
+            title: "Cross Community Chess Tourney",
+            description: "Турнир по шахматам с участием пяти проектов: Fogochain, Raiku, Pyth, SOON и Magicblock. Соревнуйтесь с другими комьюнити и выигрывайте призы!",
+            baseDate: new Date(2026, 0, 30, 15, 0, 0), // 30 декабря 2025, 12:00 UTC
+            frequency: "once", // ОДНОРАЗОВЫЙ
+            discordLink: "https://discord.gg/magicblock",
+            roleMention: "@All",
+            participants: 150,
+            image: "/events/chess-tourney.jpg",
+            author: "MagicBlock Community",
+            authorAvatar: "/avatars/mgb intern.jpg",
+            scheduleNote: "Разовый турнир - 30 декабря 2025",       
+        },
+        {
+            id: 9,
+            emoji: "🎮",
+            title: "Tetris Battle Royale",
+            description: "Классический тетрис в формате PvP battle royale. Играйте друг против друга, выживает сильнейший!",
+            baseDate: new Date(2026, 0, 30, 20, 0, 0), // 30 декабря 2025, 17:00 UTC
+            frequency: "once", // ОДНОРАЗОВЫЙ
+            discordLink: "https://discord.gg/magicblock",
+            roleMention: "@Gamers",
+            participants: 80,
+            image: "/events/tetris-battle.jpg",
+            author: "MagicBlock Community",
+            authorAvatar: "/avatars/mgb intern.jpg",
+            scheduleNote: "Разовый ивент - 30 декабря 2025",
+        },
+
         {
             id: 1,
             emoji: "☕",
@@ -1139,6 +1201,38 @@ const CommunityPage = ({ t }) => {
             scheduleNote: "Повторяется ежемесячно (первый четверг)"
         }
     ] : [
+
+            {
+                id: 8,
+                emoji: "♟️",
+                title: "Cross Community Chess Tourney",
+                description: "Chess tournament featuring five projects: Fogochain, Raiku, Pyth, SOON, and Magicblock. Compete with other communities and win prizes!",
+                baseDate: new Date(2026, 0, 30, 15, 0, 0), // December 30, 2025, 12:00 UTC
+                frequency: "once", // ONE-TIME
+                discordLink: "https://discord.gg/magicblock",
+                roleMention: "@All",
+                participants: 150,
+                image: "/events/chess-tourney.jpg",
+                author: "MagicBlock Community",
+                authorAvatar: "/avatars/mgb intern.jpg",
+                scheduleNote: "One-time tournament - December 30, 2025",
+            },
+            {
+                id: 9,
+                emoji: "🎮",
+                title: "Tetris Battle Royale",
+                description: "Good old classic tetris but in PvP battle royale format. Play against each other, only the strongest survives!",
+                baseDate: new Date(2026, 0, 30, 20, 0, 0), // December 30, 2025, 17:00 UTC
+                frequency: "once", // ONE-TIME
+                discordLink: "https://discord.gg/magicblock",
+                roleMention: "@Gamers",
+                participants: 80,
+                image: "/events/tetris-battle.jpg",
+                author: "MagicBlock Community",
+                authorAvatar: "/avatars/mgb intern.jpg",
+                scheduleNote: "One-time event - December 30, 2025",
+            },
+
         {
             id: 1,
             emoji: "☕",
@@ -1245,6 +1339,54 @@ const CommunityPage = ({ t }) => {
             scheduleNote: "Repeats monthly (first Thursday)"
         }
     ];
+
+    const getNextEventDate = (baseDate, frequency) => {
+        const now = new Date();
+        const eventDate = new Date(baseDate);
+
+        // Для одноразовых событий - возвращаем именно указанную дату
+        if (frequency === 'once') {
+            return eventDate;
+        }
+
+        let nextDate = new Date(eventDate);
+
+        if (frequency === 'daily') {
+            while (nextDate <= now || nextDate.getDay() === 0 || nextDate.getDay() === 6) {
+                nextDate.setDate(nextDate.getDate() + 1);
+            }
+            nextDate.setHours(eventDate.getHours(), eventDate.getMinutes(), 0, 0);
+        } else if (frequency === 'weekly') {
+            const targetDay = eventDate.getDay();
+            const today = now.getDay();
+
+            let daysToAdd = targetDay - today;
+            if (daysToAdd <= 0 || (daysToAdd === 0 && eventDate.getTime() <= now.getTime())) {
+                daysToAdd += 7;
+            }
+
+            nextDate = new Date(now);
+            nextDate.setDate(now.getDate() + daysToAdd);
+            nextDate.setHours(eventDate.getHours(), eventDate.getMinutes(), 0, 0);
+        } else if (frequency === 'biweekly') {
+            nextDate = new Date(eventDate);
+            while (nextDate <= now) {
+                nextDate.setDate(nextDate.getDate() + 14);
+            }
+        } else if (frequency === 'monthly') {
+            nextDate = new Date(eventDate);
+            while (nextDate <= now) {
+                nextDate.setMonth(nextDate.getMonth() + 1);
+                const firstDay = new Date(nextDate.getFullYear(), nextDate.getMonth(), 1);
+                let daysToAdd = (4 - firstDay.getDay() + 7) % 7;
+                if (daysToAdd === 0) daysToAdd = 7;
+                nextDate.setDate(1 + daysToAdd);
+                nextDate.setHours(eventDate.getHours(), eventDate.getMinutes(), 0, 0);
+            }
+        }
+
+        return nextDate;
+    };
 
     const events = eventTemplates.map(template => {
         const nextDate = getNextEventDate(template.baseDate, template.frequency);
@@ -1514,9 +1656,82 @@ const EventCard = ({ event, community, t }) => {
                 <h3 className="event-title">{event.title}</h3>
                 <p className="event-description">{event.description}</p>
 
+                {/* Дополнительная информация для специальных ивентов */}
+                {event.specialInfo && (
+                    <div className="special-event-info">
+                        {/* Для Chess Tourney */}
+                        {event.title === "Cross Community Chess Tourney" && (
+                            <>
+                                <div className="special-section">
+                                    <h4>{_isRussian ? "Проекты-участники:" : "Participating Projects:"}</h4>
+                                    <div className="projects-grid">
+                                        {event.specialInfo.projects.map((project, idx) => (
+                                            <a
+                                                key={idx}
+                                                href={project.discord}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="project-link"
+                                            >
+                                                <span className="project-name">{project.name}</span>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="special-section">
+                                    <h4>{_isRussian ? "Призовой фонд:" : "Prize Pool:"}</h4>
+                                    <ul className="prize-list">
+                                        {event.specialInfo.prizePool.map((prize, idx) => (
+                                            <li key={idx}>{prize}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="special-section">
+                                    <h4>{_isRussian ? "Правила:" : "Rules:"}</h4>
+                                    <ul className="rules-list">
+                                        {event.specialInfo.rules.map((rule, idx) => (
+                                            <li key={idx}>{rule}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Для Tetris Battle */}
+                        {event.title === "Tetris Battle Royale" && (
+                            <>
+                                <div className="special-section">
+                                    <h4>{_isRussian ? "Как присоединиться:" : "How to Join:"}</h4>
+                                    <ul className="requirements-list">
+                                        {event.specialInfo.requirements.map((req, idx) => (
+                                            <li key={idx}>{req}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="special-section">
+                                    <h4>{_isRussian ? "Правила игры:" : "Game Rules:"}</h4>
+                                    <ul className="rules-list">
+                                        {event.specialInfo.rules.map((rule, idx) => (
+                                            <li key={idx}>{rule}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+
+                {/* ВОТ ЭТУ СЕКЦИЮ ДОБАВЛЯЕМ/ЗАМЕНЯЕМ */}
                 <div className="event-schedule-note">
-                    <span className="schedule-note-icon">🔄</span>
-                    <span className="schedule-note-text">{event.scheduleNote}</span>
+                    <span className="schedule-note-icon">
+                        {event.frequency === 'once' ? '📅' : '🔄'}
+                    </span>
+                    <span className="schedule-note-text">
+                        {event.scheduleNote}
+                    </span>
                 </div>
 
                 <div className="event-details">
@@ -1537,6 +1752,46 @@ const EventCard = ({ event, community, t }) => {
                             <span className="detail-value">{event.roleMention}</span>
                         </div>
                     </div>
+
+                    {/* Ссылки для регистрации */}
+                    {event.specialInfo?.registrationLink && (
+                        <div className="event-detail">
+                            <span className="detail-icon">🔗</span>
+                            <div className="detail-content">
+                                <span className="detail-label">
+                                    {_isRussian ? "Регистрация:" : "Registration:"}
+                                </span>
+                                <a
+                                    href={event.specialInfo.registrationLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="detail-link"
+                                >
+                                    {_isRussian ? "Ссылка" : "Link"}
+                                </a>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Ссылка на Discord событие для Tetris */}
+                    {event.specialInfo?.discordEventLink && (
+                        <div className="event-detail">
+                            <span className="detail-icon">🔔</span>
+                            <div className="detail-content">
+                                <span className="detail-label">
+                                    {_isRussian ? "Напоминание:" : "Reminder:"}
+                                </span>
+                                <a
+                                    href={event.specialInfo.discordEventLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="detail-link"
+                                >
+                                    {_isRussian ? "Discord событие" : "Discord event"}
+                                </a>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="event-actions">
@@ -1552,17 +1807,31 @@ const EventCard = ({ event, community, t }) => {
                         </svg>
                     </a>
 
-                    <a
-                        href={`https://discord.com/events/943797222162726962/`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="event-action-btn reminder-btn"
-                    >
-                        <span>{community.setReminder}</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                        </svg>
-                    </a>
+                    {event.specialInfo?.lobbyChannel ? (
+                        <a
+                            href={event.specialInfo.lobbyChannel}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="event-action-btn reminder-btn"
+                        >
+                            <span>{_isRussian ? "Лобби" : "Lobby"}</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                        </a>
+                    ) : (
+                        <a
+                            href={event.discordLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="event-action-btn reminder-btn"
+                        >
+                            <span>{community.setReminder}</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                            </svg>
+                        </a>
+                    )}
                 </div>
 
                 <div className="event-motivation">
