@@ -779,7 +779,7 @@ const CommunityPage = ({ t }) => {
         image: "challenges/bingo.jpg",
         authorAvatars: ["avatars/weeklang.jpg"],
         authorNames: ["Weeklang (@Yurii_week)"],
-        tweetLink: "https://x.com/Yurii_week/status/2014632100223594522",
+        tweetLink: "https://x.com/Yurii_week/status/2015746704679579677",
         hashtags: ["#MagicBlock", "#BINGO", "#Challenge"] // ДОБАВЛЕНО
     },
     {
@@ -790,7 +790,7 @@ const CommunityPage = ({ t }) => {
         image: "challenges/dota-art.jpg",
         authorAvatars: ["avatars/l1ndlee.jpg"],
         authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
-        tweetLink: "https://x.com/l1ndlee/status/2014527891788062715",
+        tweetLink: "https://x.com/l1ndlee/status/2015877350378951094",
         hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
     },
     {
@@ -801,7 +801,7 @@ const CommunityPage = ({ t }) => {
         image: "challenges/achievements.jpg",
         authorAvatars: ["avatars/bogdan.jpg"],
         authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
-        tweetLink: "https://x.com/absBogdan/status/2014498005682057261",
+        tweetLink: "https://x.com/absbogdan/status/2016085311994888343",
         hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
     },
     {
@@ -812,7 +812,7 @@ const CommunityPage = ({ t }) => {
         image: "challenges/muggle-hunt.jpg",
         authorAvatars: ["avatars/garbar.jpg"],
         authorNames: ["Garbar (@garbar27)"],
-        tweetLink: "https://x.com/garbar27/status/2014395262808457221",
+        tweetLink: "https://x.com/garbar27/status/2015334690786599216",
         hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
     },
     {
