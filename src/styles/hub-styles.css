@@ -4316,3 +4316,53 @@ body {
     backdrop-filter: blur(4px);
 }
 
+/* ===== FIX FOR SCROLL ISSUE ===== */
+html {
+    overflow-y: auto !important;
+    scroll-behavior: smooth;
+}
+
+body {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+}
+
+.hub-shell {
+    min-height: 100vh;
+    height: auto !important;
+    overflow-y: auto !important;
+}
+
+/* Fix background blocking */
+.hub-background-wrapper {
+    pointer-events: none !important;
+}
+
+/* Ensure main content is scrollable */
+.main-content {
+    overflow-y: visible !important;
+    min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+}
+
+/* Mobile touch scroll fix */
+@media (max-width: 768px) {
+    body {
+        -webkit-overflow-scrolling: touch !important;
+        overflow-y: auto !important;
+    }
+
+    .hub-shell {
+        overflow-y: auto !important;
+    }
+}
+
+/* Force scrollbar to always be visible */
+::-webkit-scrollbar {
+    display: block !important;
+}
+
+/* Remove any potential scroll blocking */
+* {
+    max-height: 1000000px;
+}
