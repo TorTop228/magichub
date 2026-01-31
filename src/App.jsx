@@ -1,13 +1,5 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles/hub-styles.css';
-
-const HUB_PARTICLES = [...Array(25)].map(() => ({
-    left: Math.random() * 100,
-    delay: Math.random() * 5,
-    duration: 12 + Math.random() * 15,
-    size: 3 + Math.random() * 5
-}));
-
 
 const AVATAR = "/QXbbs7jJ_400x400.jpg";
 const MB_LOGO = "/stEObS-j_400x400.jpg";
@@ -34,6 +26,7 @@ const translations = {
         project: "ПРОЕКТ",
         community: "СООБЩЕСТВО",
         news: "НОВОСТИ",
+        quizTab: "🧪 КВИЗ",
         about: "ОБО МНЕ",
         media: "МЕДИА",
         torName: "Tor00_1",
@@ -206,6 +199,37 @@ const translations = {
             signature: "Подпись:",
             torSignature: "Tor00_1 (@cryptoo_tor)",
             magicBlockSeal: "MagicBlock Fan Hub"
+        },
+
+        hallOfFameTab: "🏆 ЗАЛ СЛАВЫ",
+        hallOfFamePage: {
+            twitterImportant: "ВАЖНО:",
+            twitterInstruction: "Сделайте quote retweet (цитатный ретвит) этого поста с вашим сертификатом и отметьте меня @cryptoo_tor",
+            twitterQuoteLink: "Ссылка на пост для quote retweet",
+            title: "Зал Славы MagicBlock Quiz",
+            subtitle: "Лучшие из лучших! Участники, показавшие выдающиеся результаты в квизе",
+            scoreFilters: "Фильтры по очкам",
+            allScores: "Все результаты",
+            score10: "🏆 10/10 Совершенно",
+            score9: "🥈 9/10 Отлично",
+            score8: "🥉 8/10 Отлично",
+            pioneers: "🚀 Первопроходцы",
+            firstCompleters: "Первые 3 завершивших",
+            leaderboard: "🏆 Таблица лидеров",
+            rank: "Место",
+            player: "Участник",
+            score: "Очки",
+            date: "Дата прохождения",
+            time: "Время",
+            twitterPost: "Пост в Twitter",
+            certificate: "Сертификат",
+            noData: "Данные будут добавлены после начала челленджа",
+            totalPlayers: "Всего участников",
+            averageScore: "Средний балл",
+            topPlayers: "Топ игроков",
+            filterByScore: "Фильтровать по очкам",
+            viewCertificate: "Посмотреть сертификат",
+            viewTwitter: "Посмотреть пост"
         }
     },
     en: {
@@ -229,6 +253,7 @@ const translations = {
         project: "PROJECT",
         community: "COMMUNITY",
         news: "NEWS",
+        quizTab: "🧪 QUIZ",
         about: "ABOUT",
         media: "MEDIA",
         torName: "Tor00_1",
@@ -402,6 +427,37 @@ const translations = {
             signature: "Signature:",
             torSignature: "Tor00_1 (@cryptoo_tor)",
             magicBlockSeal: "MagicBlock Fan Hub"
+        },
+
+        hallOfFameTab: "🏆 HALL OF FAME",
+        hallOfFamePage: {
+            twitterImportant: "IMPORTANT:",
+            twitterInstruction: "Make a quote retweet of this post with your certificate and mention me @cryptoo_tor",
+            twitterQuoteLink: "Link for quote retweet",
+            title: "MagicBlock Quiz Hall of Fame",
+            subtitle: "The best of the best! Participants who showed outstanding results in the quiz",
+            scoreFilters: "Score Filters",
+            allScores: "All Scores",
+            score10: "🏆 10/10 Perfect",
+            score9: "🥈 9/10 Excellent",
+            score8: "🥉 8/10 Great",
+            pioneers: "🚀 Pioneers",
+            firstCompleters: "First 3 Completers",
+            leaderboard: "🏆 Leaderboard",
+            rank: "Rank",
+            player: "Player",
+            score: "Score",
+            date: "Completion Date",
+            time: "Time",
+            twitterPost: "Twitter Post",
+            certificate: "Certificate",
+            noData: "Data will be added after challenge starts",
+            totalPlayers: "Total Players",
+            averageScore: "Average Score",
+            topPlayers: "Top Players",
+            filterByScore: "Filter by Score",
+            viewCertificate: "View Certificate",
+            viewTwitter: "View Post"
         }
     }
 };
@@ -459,9 +515,6 @@ function LanguageSelector({ onLanguageSelect }) {
 }
 
 function HubBackground() {
-    // Убираем ВСЁ: requestAnimationFrame, mousemove, частицы
-    // Оставляем только статичный фон
-
     return (
         <>
             <div className="hub-background-wrapper hub-anim-fade-in">
@@ -479,17 +532,19 @@ function HubBackground() {
 
 function HubApp({ t, currentLang, setCurrentLang }) {
     const [page, setPage] = useState('home');
+    const [showQuizBadge, setShowQuizBadge] = useState(true);
 
     const renderContent = () => {
         switch (page) {
-            case 'home': return <HomePage setPage={setPage} t={t} />;
+            case 'home': return <HomePage setPage={setPage} t={t} showQuizBadge={showQuizBadge} setShowQuizBadge={setShowQuizBadge} />;
             case 'magicblock': return <MagicBlockPage t={t} setPage={setPage} />;
             case 'community': return <CommunityPage t={t} />;
             case 'news': return <NewsPage t={t} />;
             case 'about': return <AboutPage t={t} />;
             case 'media': return <MediaPage t={t} />;
             case 'quiz': return <QuizPage t={t} />;
-            default: return <HomePage setPage={setPage} t={t} />;
+            case 'halloffame': return <HallOfFamePage t={t} />;
+            default: return <HomePage setPage={setPage} t={t} showQuizBadge={showQuizBadge} setShowQuizBadge={setShowQuizBadge} />;
         }
     };
 
@@ -540,7 +595,10 @@ function HubApp({ t, currentLang, setCurrentLang }) {
                         {t.media}
                     </button>
                     <button onClick={() => setPage('quiz')} className={page === 'quiz' ? 'active' : ''}>
-                        🧪 КВИЗ
+                        {t.quizTab} {showQuizBadge && <span className="quiz-badge">🔥</span>}
+                    </button>
+                    <button onClick={() => setPage('halloffame')} className={page === 'halloffame' ? 'active' : ''}>
+                        🏆 {t.hallOfFameTab || "HALL OF FAME"}
                     </button>
                 </div>
 
@@ -575,55 +633,92 @@ function HubApp({ t, currentLang, setCurrentLang }) {
     );
 }
 
-const HomePage = ({ setPage, t }) => (
-    <div className="page hub-anim-fade-in">
-        <div className="intro-grid">
-            <div className="intro-card hub-anim-reveal" style={{ animationDelay: '0.1s' }}>
-                <div className="avatar-container">
-                    <h3>{t.torName}</h3>
-                    <img src={AVATAR} alt="Tor" className="avatar" />
+const HomePage = ({ setPage, t, showQuizBadge, setShowQuizBadge }) => {
+    console.log('showQuizBadge:', showQuizBadge); // Для отладки
+
+    return (
+        <div className="page hub-anim-fade-in">
+            <div className="intro-grid">
+                <div className="intro-card hub-anim-reveal" style={{ animationDelay: '0.1s' }}>
+                    <div className="avatar-container">
+                        <h3>{t.torName}</h3>
+                        <img src={AVATAR} alt="Tor" className="avatar" />
+                    </div>
+                    <p className="compact-text">{t.suggestions}</p>
                 </div>
-                <p className="compact-text">{t.suggestions}</p>
+
+                <div className="video-card">
+                    <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        width="100%"
+                        height="100%"
+                        style={{
+                            objectFit: 'cover',
+                            borderRadius: '12px',
+                            pointerEvents: 'none'
+                        }}
+                        preload="auto"
+                        src="https://i.imgur.com/ES1SUZK.mp4"
+                    />
+                </div>
             </div>
 
-            <div className="video-card">
-                <video
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    width="100%"
-                    height="100%"
-                    style={{
-                        objectFit: 'cover',
-                        borderRadius: '12px',
-                        pointerEvents: 'none'
-                    }}
-                    preload="auto"
-                    src="https://i.imgur.com/ES1SUZK.mp4"
-                />
-            </div>
-        </div>
+            {/* Quiz Challenge Banner */}
+            {showQuizBadge !== false && (
+                <div className="quiz-challenge-banner hub-anim-reveal-up" style={{ animationDelay: '0.2s' }}>
+                    <div className="quiz-banner-content">
+                        <div className="quiz-banner-icon">🔥</div>
+                        <div className="quiz-banner-text">
+                            <h3>{t.quizPage.title === "Квиз MagicBlock" ? "Сейчас идет челлендж с квизом!" : "Quiz Challenge is Live Now!"}</h3>
+                            <p>{t.quizPage.title === "Квиз MagicBlock"
+                                ? "Пройди квиз и попади в Зал Славы MagicBlock! Первые участники получат особое признание."
+                                : "Take the quiz and get into MagicBlock Hall of Fame! First participants get special recognition."}</p>
+                        </div>
+                        <button
+                            className="quiz-banner-button"
+                            onClick={() => {
+                                console.log('Navigating to quiz page');
+                                setPage('quiz');
+                                if (setShowQuizBadge) {
+                                    setShowQuizBadge(false);
+                                }
+                            }}
+                        >
+                            🚀 {t.quizPage.title === "Квиз MagicBlock" ? "Пройти квиз сейчас!" : "Take the quiz now!"}
+                        </button>
+                        <button
+                            className="quiz-banner-close"
+                            onClick={() => setShowQuizBadge && setShowQuizBadge(false)}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
 
-        <div className="cards-grid">
-            <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.3s' }} onClick={() => setPage('magicblock')}>
-                <span className="icon">🧩</span>
-                <h3>{t.magicBlockCard}</h3>
-                <p>{t.magicBlockDesc}</p>
-            </div>
-            <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.4s' }} onClick={() => setPage('news')}>
-                <span className="icon">📰</span>
-                <h3>{t.newsCard}</h3>
-                <p>{t.newsDesc}</p>
-            </div>
-            <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.5s' }} onClick={() => setPage('community')}>
-                <span className="icon">👥</span>
-                <h3>{t.communityCard}</h3>
-                <p>{t.communityDesc}</p>
+            <div className="cards-grid">
+                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.3s' }} onClick={() => setPage('magicblock')}>
+                    <span className="icon">🧩</span>
+                    <h3>{t.magicBlockCard}</h3>
+                    <p>{t.magicBlockDesc}</p>
+                </div>
+                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.4s' }} onClick={() => setPage('news')}>
+                    <span className="icon">📰</span>
+                    <h3>{t.newsCard}</h3>
+                    <p>{t.newsDesc}</p>
+                </div>
+                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.5s' }} onClick={() => setPage('community')}>
+                    <span className="icon">👥</span>
+                    <h3>{t.communityCard}</h3>
+                    <p>{t.communityDesc}</p>
+                </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const MagicBlockPage = ({ t, setPage }) => {
     const magicBlock = t.magicBlockPage;
@@ -745,8 +840,6 @@ const CommunityPage = ({ t }) => {
     const community = t.communityPage;
     const [activeSection, setActiveSection] = useState('challenges');
 
-   
-
     const formatEventDate = (dateObj) => {
         const isRussian = t.communityPage.title === "Сообщество";
 
@@ -770,322 +863,300 @@ const CommunityPage = ({ t }) => {
     };
 
     const challenges = t.communityPage.title === "Сообщество" ? [
-    // НОВЫЕ ЧЕЛЛЕНДЖИ - ДОБАВЛЕНЫ В НАЧАЛО
-    {
-        id: 9,
-        emoji: "🎯",
-        title: "BINGO Challenge",
-        description: "Я организую новый челлендж на @magicblock под названием BINGO! Ваша задача - внимательно прочитать каждую ячейку и либо отметить ее галочкой, либо вычеркнуть, а также процитировать этот пост и поделиться своими результатами. Вы можете заметить, что некоторые ячейки легко понять, а другие предназначены для тех, кто действительно погружен в мир магии и волшебства #magicblock. Давайте посмотрим, насколько вы настоящий волшебник! 🧙‍♂️",
-        image: "challenges/bingo.jpg",
-        authorAvatars: ["avatars/weeklang.jpg"],
-        authorNames: ["Weeklang (@Yurii_week)"],
-        tweetLink: "https://x.com/Yurii_week/status/2015746704679579677",
-        hashtags: ["#MagicBlock", "#BINGO", "#Challenge"] // ДОБАВЛЕНО
-    },
-    {
-        id: 10,
-        emoji: "🎨",
-        title: "Dota 2 Art Challenge",
-        description: "gMagic друзья! Я запускаю челлендж, где вам нужно нарисовать арт, связанный с вашей любимой игрой. Моя любимая игра - Dota 2, поэтому волшебник играет в нее. С нетерпением жду ваших работ!",
-        image: "challenges/dota-art.jpg",
-        authorAvatars: ["avatars/l1ndlee.jpg"],
-        authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
-        tweetLink: "https://x.com/l1ndlee/status/2015877350378951094",
-        hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
-    },
-    {
-        id: 11,
-        emoji: "🏆",
-        title: "Achievements Showcase Challenge",
-        description: "Покажи свои достижения в @magicblock. Процитируй мой пост и отметь галочками пункты, где выполнены ваши баллы 🔥",
-        image: "challenges/achievements.jpg",
-        authorAvatars: ["avatars/bogdan.jpg"],
-        authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
-        tweetLink: "https://x.com/absbogdan/status/2016085311994888343",
-        hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
-    },
-    {
-        id: 12,
-        emoji: "🔍",
-        title: "The Muggle Hunt",
-        description: "Запускаю новый челлендж - The Muggle Hunt✨ Если вы, как и я, любите атмосферу Гарри Поттера, то это для вас🪄 Что нужно сделать: напишите мне в личные сообщения, используйте слово Muggle, чтобы получить свою карточку с фото разыскиваемого. Опубликуйте ее и напишите краткое описание того, что вам больше всего нравится в фильмах о Гарри Поттере. Поделитесь мыслями о том, как магия из фильма может быть связана с MagicBlock. Не забудьте процитировать ретвит этого поста💜 Давайте найдем всех маглов вместе👀",
-        image: "challenges/muggle-hunt.jpg",
-        authorAvatars: ["avatars/garbar.jpg"],
-        authorNames: ["Garbar (@garbar27)"],
-        tweetLink: "https://x.com/garbar27/status/2015334690786599216",
-        hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
-    },
-    {
-        id: 1,
-        emoji: "🎮",
-        title: "Game Creation Challenge",
-        description: "Создай любую крутую игру, выложи в Twitter с тегами @magicblock и @himas.somi. Автор обязательно поддержит тебя! Пример игры от автора — Magic Jumper.",
-        image: "challenges/game-creation.webp",
-        authorAvatars: ["avatars/himas.jpg"],
-        authorNames: ["@himas.somi"],
-        tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
-        hashtags: ["#MagicBlock", "#GameDev"]
-    },
-    {
-        id: 2,
-        emoji: "🎨",
-        title: "Half-Wizard Challenge",
-        description: "Волшебник обрёл себя с MagicBlock! Нарисуй продолжение истории, добавь текст 'Life After MagicBlock' к своему арту и сделай quote retweet поста авторов.",
-        image: "challenges/half-wizard.webp",
-        authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
-        authorNames: ["@wtf4uk", "@Yurii_week"],
-        tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
-        hashtags: ["#MagicBlock", "#ArtChallenge"]
-    },
-    {
-        id: 3,
-        emoji: "📖",
-        title: "Secret Participant Diary",
-        description: "Garbar запускает челлендж 'Тайный дневник участника MagicBlock'. Напиши автору в личные сообщения для персонального дневника.",
-        image: "challenges/secret-diary.webp",
-        authorAvatars: ["avatars/garbar.jpg"],
-        authorNames: ["Garbar"],
-        tweetLink: "https://x.com/garbar27/status/2011697269150793862",
-        hashtags: ["#MagicBlock", "#Community"]
-    },
-    {
-        id: 4,
-        emoji: "🧙‍♂️",
-        title: "The Wizard's Ephemeral Block",
-        description: "Продолжи историю волшебника, который смог прикоснуться к таинственному эфемерному блоку. Покажи, какие двери открылись для него.",
-        image: "challenges/wizards-block.webp",
-        authorAvatars: ["avatars/saiho.jpg"],
-        authorNames: ["Saiho"],
-        tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
-        hashtags: ["#MagicBlock", "#Storytelling"]
-    },
-    {
-        id: 5,
-        emoji: "📸",
-        title: "Random Picture with Magic",
-        description: "Выбери случайное фото из галереи, объясни что ты делаешь, добавь магического маскота. Пример от автора: 'Пытался впервые научиться сноубордингу'.",
-        image: "challenges/random-photo.webp",
-        authorAvatars: ["avatars/cryptoshi.jpg"],
-        authorNames: ["Cryptoshi | Bulk"],
-        tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
-        hashtags: ["#MagicBlock", "#PhotoChallenge"]
-    },
-    {
-        id: 6,
-        emoji: "🧙‍♂️",
-        title: "Build Your Wizard Challenge",
-        description: "Собери своего уникального Волшебника! Добавь 4 магических предмета к шаблону, объясни их значение в твите.",
-        image: "challenges/build-wizard.webp",
-        authorAvatars: ["avatars/crypto-viktor.jpg"],
-        authorNames: ["Crypto Viktor"],
-        tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
-        hashtags: ["#MagicBlock", "#WizardChallenge"]
-    },
-    {
-        id: 7,
-        emoji: "🏆",
-        title: "Community Certificate Challenge",
-        description: "Я создал сертификат для сообщества MagicBlock, который покажет вашу преданность. Однако вам также нужно будет ответить на 3 вопроса викторины, на которые смогут правильно ответить только самые преданные участники сообщества.",
-        image: "challenges/pfp-generatorr.webp",
-        authorAvatars: ["avatars/garbar.jpg"],
-        authorNames: ["Garbar"],
-        tweetLink: "https://x.com/garbar27/status/2013172329266758023",
-        hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
-        specialNote: "Ссылка на викторину: https://community-certificate-vercel.vercel.app",
-        requirements: [
-            "Пройти викторину из 3 вопросов",
-            "Ответить правильно на все вопросы",
-            "Получить персонализированный сертификат",
-            "Поделиться результатом в Twitter"
-        ],
-        prize: "Эксклюзивный цифровой сертификат + роль в Discord"
-    },
-    {
-        id: 8,
-        emoji: "✨",
-        title: "MagicBlock Profile Picture Generator",
-        description: "Мы с @0xCryptoViktor_ создали сайт, где можно создавать аватары в стиле MagicBlock. Попробуйте и поделитесь своим фидбеком!",
-        image: "challenges/pfp-generator.webp",
-        authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
-        authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
-        tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
-        specialNote: "https://magicblock-pfp-generator.netlify.app",
-        hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"],
-        requirements: [
-            "Создать аватарку на сайте",
-            "Экспортировать в высоком качестве",
-            "Установить как аватар в соцсетях",
-            "Поделиться скриншотом в Twitter"
-        ],
-        features: [
-            "Кастомизация волос, глаз, аксессуаров",
-            "Магические эффекты и свечения",
-            "NFT-стиль с элементами MagicBlock",
-            "Бесплатный экспорт в PNG/SVG"
-        ]
-    }
-] : [
-    // АНГЛИЙСКАЯ ВЕРСИЯ
-    {
-        id: 9,
-        emoji: "🎯",
-        title: "BINGO Challenge",
-        description: "I'm organizing a new challenge on @magicblock called BINGO! Your task is to carefully read each cell and either check it off or cross it out, and also quote this post and share your results. You may notice that some cells are easy to understand, while others are designed for those who are truly immersed in the world of magic and wizardry #magicblock. Let's see how much of a true wizard you are! 🧙‍♂️",
-        image: "challenges/bingo.jpg",
-        authorAvatars: ["avatars/weeklang.jpg"],
-        authorNames: ["Weeklang (@Yurii_week)"],
-        tweetLink: "https://x.com/Yurii_week/status/2014632100223594522",
-        hashtags: ["#MagicBlock", "#BINGO", "#Challenge"]
-    },
-    {
-        id: 10,
-        emoji: "🎨",
-        title: "Dota 2 Art Challenge",
-        description: "gMagic folks! I'm launching a challenge where you'll need to draw art related to your favorite game. My favorite game is Dota 2, so wizard is playing it. I look forward to seeing your work!",
-        image: "challenges/dota-art.jpg",
-        authorAvatars: ["avatars/l1ndlee.jpg"],
-        authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
-        tweetLink: "https://x.com/l1ndlee/status/2014527891788062715",
-        hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
-    },
-    {
-        id: 11,
-        emoji: "🏆",
-        title: "Achievements Showcase Challenge",
-        description: "Show off your achievements in @magicblock. Quote my post and tick the boxes where your points are fulfilled 🔥",
-        image: "challenges/achievements.jpg",
-        authorAvatars: ["avatars/bogdan.jpg"],
-        authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
-        tweetLink: "https://x.com/absBogdan/status/2014498005682057261",
-        hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
-    },
-    {
-        id: 12,
-        emoji: "🔍",
-        title: "The Muggle Hunt",
-        description: "I'm launching a new challenge - The Muggle Hunt✨ If, like me, you love the atmosphere of Harry Potter, then this is for you🪄 What you need to do: DM me, use the word Muggle to get your Wanted photo card. Post it and write a short description of what you like most about the Harry Potter films. Share your thoughts on how the magic from the film can be related to MagicBlock. Don't forget to quote retweet to this post💜 Let's find all the Muggles together👀",
-        image: "challenges/muggle-hunt.jpg",
-        authorAvatars: ["avatars/garbar.jpg"],
-        authorNames: ["Garbar (@garbar27)"],
-        tweetLink: "https://x.com/garbar27/status/2014395262808457221",
-        hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
-    },
-    {
-        id: 1,
-        emoji: "🎮",
-        title: "Game Creation Challenge",
-        description: "Create any cool game, post it on Twitter with tags @magicblock and @himas.somi. The author will definitely support you! Author's example game is Magic Jumper.",
-        image: "challenges/game-creation.webp",
-        authorAvatars: ["avatars/himas.jpg"],
-        authorNames: ["@himas.somi"],
-        tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
-        hashtags: ["#MagicBlock", "#GameDev"]
-    },
-    {
-        id: 2,
-        emoji: "🎨",
-        title: "Half-Wizard Challenge",
-        description: "The wizard found himself with MagicBlock! Draw a continuation of the story, add the text 'Life After MagicBlock' to your art and make a quote retweet of the authors' post.",
-        image: "challenges/half-wizard.webp",
-        authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
-        authorNames: ["@wtf4uk", "@Yurii_week"],
-        tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
-        hashtags: ["#MagicBlock", "#ArtChallenge"]
-    },
-    {
-        id: 3,
-        emoji: "📖",
-        title: "Secret Participant Diary",
-        description: "Garbar launches the 'Secret Diary of a MagicBlock Participant' challenge. Write to the author in private messages for a personal diary.",
-        image: "challenges/secret-diary.webp",
-        authorAvatars: ["avatars/garbar.jpg"],
-        authorNames: ["Garbar"],
-        tweetLink: "https://x.com/garbar27/status/2011697269150793862",
-        hashtags: ["#MagicBlock", "#Community"]
-    },
-    {
-        id: 4,
-        emoji: "🧙‍♂️",
-        title: "The Wizard's Ephemeral Block",
-        description: "Continue the story of a wizard who was able to touch a mysterious ephemeral block. Show what doors have opened for him.",
-        image: "challenges/wizards-block.webp",
-        authorAvatars: ["avatars/saiho.jpg"],
-        authorNames: ["Saiho"],
-        tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
-        hashtags: ["#MagicBlock", "#Storytelling"]
-    },
-    {
-        id: 5,
-        emoji: "📸",
-        title: "Random Picture with Magic",
-        description: "Choose a random photo from the gallery, explain what you are doing, add a magical mascot. Example from the author: 'Tried to learn snowboarding for the first time'.",
-        image: "challenges/random-photo.webp",
-        authorAvatars: ["avatars/cryptoshi.jpg"],
-        authorNames: ["Cryptoshi | Bulk"],
-        tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
-        hashtags: ["#MagicBlock", "#PhotoChallenge"]
-    },
-    {
-        id: 6,
-        emoji: "🧙‍♂️",
-        title: "Build Your Wizard Challenge",
-        description: "Build your unique Wizard! Add 4 magical items to the template, explain their meaning in a tweet.",
-        image: "challenges/build-wizard.webp",
-        authorAvatars: ["avatars/crypto-viktor.jpg"],
-        authorNames: ["Crypto Viktor"],
-        tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
-        hashtags: ["#MagicBlock", "#WizardChallenge"]
-    },
-    {
-        id: 7,
-        emoji: "🏆",
-        title: "Community Certificate Challenge",
-        description: "I have created a certificate for the MagicBlock community that will show your dedication. However, you will also need to answer 3 quiz questions that only the most dedicated members of the community will be able to answer correctly.",
-        image: "challenges/pfp-generatorr.webp",
-        authorAvatars: ["avatars/garbar.jpg"],
-        authorNames: ["Garbar"],
-        tweetLink: "https://x.com/garbar27/status/2013172329266758023",
-        hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
-        specialNote: "Quiz link: https://community-certificate-vercel.vercel.app"
-    },
-    {
-        id: 8,
-        emoji: "✨",
-        title: "MagicBlock Profile Picture Generator",
-        description: "We built a website with @0xCryptoViktor_ where you can create MagicBlock-style profile pictures. Try it out and share your feedback!",
-        image: "challenges/pfp-generator.webp",
-        authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
-        authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
-        tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
-        specialNote: "https://magicblock-pfp-generator.netlify.app",
-        hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"]
-    }
-];
+        {
+            id: 9,
+            emoji: "🎯",
+            title: "BINGO Challenge",
+            description: "Я организую новый челлендж на @magicblock под названием BINGO! Ваша задача - внимательно прочитать каждую ячейку и либо отметить ее галочкой, либо вычеркнуть, а также процитировать этот пост и поделиться своими результатами. Вы можете заметить, что некоторые ячейки легко понять, а другие предназначены для тех, кто действительно погружен в мир магии и волшебства #magicblock. Давайте посмотрим, насколько вы настоящий волшебник! 🧙‍♂️",
+            image: "challenges/bingo.jpg",
+            authorAvatars: ["avatars/weeklang.jpg"],
+            authorNames: ["Weeklang (@Yurii_week)"],
+            tweetLink: "https://x.com/Yurii_week/status/2014632100223594522",
+            hashtags: ["#MagicBlock", "#BINGO", "#Challenge"]
+        },
+        {
+            id: 10,
+            emoji: "🎨",
+            title: "Favorite game challange",
+            description: "gMagic друзья! Я запускаю челлендж, где вам нужно нарисовать арт, связанный с вашей любимой игрой. Моя любимая игра - Dota 2, поэтому волшебник играет в нее. С нетерпением жду ваших работ!",
+            image: "challenges/dota-art.jpg",
+            authorAvatars: ["avatars/l1ndlee.jpg"],
+            authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
+            tweetLink: "https://x.com/l1ndlee/status/2014527891788062715",
+            hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
+        },
+        {
+            id: 11,
+            emoji: "🏆",
+            title: "Achievements Showcase Challenge",
+            description: "Покажи свои достижения в @magicblock. Процитируй мой пост и отметь галочками пункты, где выполнены ваши баллы 🔥",
+            image: "challenges/achievements.jpg",
+            authorAvatars: ["avatars/bogdan.jpg"],
+            authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
+            tweetLink: "https://x.com/absBogdan/status/2014498005682057261",
+            hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
+        },
+        {
+            id: 12,
+            emoji: "🔍",
+            title: "The Muggle Hunt",
+            description: "Запускаю новый челлендж - The Muggle Hunt✨ Если вы, как и я, любите атмосферу Гарри Поттера, то это для вас🪄 Что нужно сделать: напишите мне в личные сообщения, используйте слово Muggle, чтобы получить свою карточку с фото разыскиваемого. Опубликуйте ее и напишите краткое описание того, что вам больше всего нравится в фильмах о Гарри Поттере. Поделитесь мыслями о том, как магия из фильма может быть связана с MagicBlock. Не забудьте процитировать ретвит этого поста💜 Давайте найдем всех маглов вместе👀",
+            image: "challenges/muggle-hunt.jpg",
+            authorAvatars: ["avatars/garbar.jpg"],
+            authorNames: ["Garbar (@garbar27)"],
+            tweetLink: "https://x.com/garbar27/status/2014395262808457221",
+            hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
+        },
+        {
+            id: 1,
+            emoji: "🎮",
+            title: "Game Creation Challenge",
+            description: "Создай любую крутую игру, выложи в Twitter с тегами @magicblock и @himas.somi. Автор обязательно поддержит тебя! Пример игры от автора — Magic Jumper.",
+            image: "challenges/game-creation.webp",
+            authorAvatars: ["avatars/himas.jpg"],
+            authorNames: ["@himas.somi"],
+            tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
+            hashtags: ["#MagicBlock", "#GameDev"]
+        },
+        {
+            id: 2,
+            emoji: "🎨",
+            title: "Half-Wizard Challenge",
+            description: "Волшебник обрёл себя с MagicBlock! Нарисуй продолжение истории, добавь текст 'Life After MagicBlock' к своему арту и сделай quote retweet поста авторов.",
+            image: "challenges/half-wizard.webp",
+            authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
+            authorNames: ["@wtf4uk", "@Yurii_week"],
+            tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
+            hashtags: ["#MagicBlock", "#ArtChallenge"]
+        },
+        {
+            id: 3,
+            emoji: "📖",
+            title: "Secret Participant Diary",
+            description: "Garbar запускает челлендж 'Тайный дневник участника MagicBlock'. Напиши автору в личные сообщения для персонального дневника.",
+            image: "challenges/secret-diary.webp",
+            authorAvatars: ["avatars/garbar.jpg"],
+            authorNames: ["Garbar"],
+            tweetLink: "https://x.com/garbar27/status/2011697269150793862",
+            hashtags: ["#MagicBlock", "#Community"]
+        },
+        {
+            id: 4,
+            emoji: "🧙‍♂️",
+            title: "The Wizard's Ephemeral Block",
+            description: "Продолжи историю волшебника, который смог прикоснуться к таинственному эфемерному блоку. Покажи, какие двери открылись для него.",
+            image: "challenges/wizards-block.webp",
+            authorAvatars: ["avatars/saiho.jpg"],
+            authorNames: ["Saiho"],
+            tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
+            hashtags: ["#MagicBlock", "#Storytelling"]
+        },
+        {
+            id: 5,
+            emoji: "📸",
+            title: "Random Picture with Magic",
+            description: "Выбери случайное фото из галереи, объясни что ты делаешь, добавь магического маскота. Пример от автора: 'Пытался впервые научиться сноубордингу'.",
+            image: "challenges/random-photo.webp",
+            authorAvatars: ["avatars/cryptoshi.jpg"],
+            authorNames: ["Cryptoshi | Bulk"],
+            tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
+            hashtags: ["#MagicBlock", "#PhotoChallenge"]
+        },
+        {
+            id: 6,
+            emoji: "🧙‍♂️",
+            title: "Build Your Wizard Challenge",
+            description: "Собери своего уникального Волшебника! Добавь 4 магических предмета к шаблону, объясни их значение в твите.",
+            image: "challenges/build-wizard.webp",
+            authorAvatars: ["avatars/crypto-viktor.jpg"],
+            authorNames: ["Crypto Viktor"],
+            tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
+            hashtags: ["#MagicBlock", "#WizardChallenge"]
+        },
+        {
+            id: 7,
+            emoji: "🏆",
+            title: "Community Certificate Challenge",
+            description: "Я создал сертификат для сообщества MagicBlock, который покажет вашу преданность. Однако вам также нужно будет ответить на 3 вопроса викторины, на которые смогут правильно ответить только самые преданные участники сообщества.",
+            image: "challenges/pfp-generatorr.webp",
+            authorAvatars: ["avatars/garbar.jpg"],
+            authorNames: ["Garbar"],
+            tweetLink: "https://x.com/garbar27/status/2013172329266758023",
+            hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
+            specialNote: "Ссылка на викторину: https://community-certificate-vercel.vercel.app"
+        },
+        {
+            id: 8,
+            emoji: "✨",
+            title: "MagicBlock Profile Picture Generator",
+            description: "Мы с @0xCryptoViktor_ создали сайт, где можно создавать аватары в стиле MagicBlock. Попробуйте и поделитесь своим фидбеком!",
+            image: "challenges/pfp-generator.webp",
+            authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
+            authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
+            tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
+            specialNote: "https://magicblock-pfp-generator.netlify.app",
+            hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"]
+        }
+    ] : [
+        {
+            id: 9,
+            emoji: "🎯",
+            title: "BINGO Challenge",
+            description: "I'm organizing a new challenge on @magicblock called BINGO! Your task is to carefully read each cell and either check it off or cross it out, and also quote this post and share your results. You may notice that some cells are easy to understand, while others are designed for those who are truly immersed in the world of magic and wizardry #magicblock. Let's see how much of a true wizard you are! 🧙‍♂️",
+            image: "challenges/bingo.jpg",
+            authorAvatars: ["avatars/weeklang.jpg"],
+            authorNames: ["Weeklang (@Yurii_week)"],
+            tweetLink: "https://x.com/Yurii_week/status/2014632100223594522",
+            hashtags: ["#MagicBlock", "#BINGO", "#Challenge"]
+        },
+        {
+            id: 10,
+            emoji: "🎨",
+            title: "Favorite game challange",
+            description: "gMagic folks! I'm launching a challenge where you'll need to draw art related to your favorite game. My favorite game is Dota 2, so wizard is playing it. I look forward to seeing your work!",
+            image: "challenges/dota-art.jpg",
+            authorAvatars: ["avatars/l1ndlee.jpg"],
+            authorNames: ["l1ndleee.base.eth (@l1ndlee)"],
+            tweetLink: "https://x.com/l1ndlee/status/2014527891788062715",
+            hashtags: ["#MagicBlock", "#Dota2", "#ArtChallenge"]
+        },
+        {
+            id: 11,
+            emoji: "🏆",
+            title: "Achievements Showcase Challenge",
+            description: "Show off your achievements in @magicblock. Quote my post and tick the boxes where your points are fulfilled 🔥",
+            image: "challenges/achievements.jpg",
+            authorAvatars: ["avatars/bogdan.jpg"],
+            authorNames: ["Bogdan (❖,❖) (@absBogdan)"],
+            tweetLink: "https://x.com/absBogdan/status/2014498005682057261",
+            hashtags: ["#MagicBlock", "#Achievements", "#Showcase"]
+        },
+        {
+            id: 12,
+            emoji: "🔍",
+            title: "The Muggle Hunt",
+            description: "I'm launching a new challenge - The Muggle Hunt✨ If, like me, you love the atmosphere of Harry Potter, then this is for you🪄 What you need to do: DM me, use the word Muggle to get your Wanted photo card. Post it and write a short description of what you like most about the Harry Potter films. Share your thoughts on how the magic from the film can be related to MagicBlock. Don't forget to quote retweet to this post💜 Let's find all the Muggles together👀",
+            image: "challenges/muggle-hunt.jpg",
+            authorAvatars: ["avatars/garbar.jpg"],
+            authorNames: ["Garbar (@garbar27)"],
+            tweetLink: "https://x.com/garbar27/status/2014395262808457221",
+            hashtags: ["#MagicBlock", "#MuggleHunt", "#HarryPotter"]
+        },
+        {
+            id: 1,
+            emoji: "🎮",
+            title: "Game Creation Challenge",
+            description: "Create any cool game, post it on Twitter with tags @magicblock and @himas.somi. The author will definitely support you! Author's example game is Magic Jumper.",
+            image: "challenges/game-creation.webp",
+            authorAvatars: ["avatars/himas.jpg"],
+            authorNames: ["@himas.somi"],
+            tweetLink: "https://x.com/tomatofroots/status/2010018300101558473",
+            hashtags: ["#MagicBlock", "#GameDev"]
+        },
+        {
+            id: 2,
+            emoji: "🎨",
+            title: "Half-Wizard Challenge",
+            description: "The wizard found himself with MagicBlock! Draw a continuation of the story, add the text 'Life After MagicBlock' to your art and make a quote retweet of the authors' post.",
+            image: "challenges/half-wizard.webp",
+            authorAvatars: ["avatars/wtf4uk.jpg", "avatars/yurii_week.jpg"],
+            authorNames: ["@wtf4uk", "@Yurii_week"],
+            tweetLink: "https://x.com/wtf4uk/status/2011002262693224759",
+            hashtags: ["#MagicBlock", "#ArtChallenge"]
+        },
+        {
+            id: 3,
+            emoji: "📖",
+            title: "Secret Participant Diary",
+            description: "Garbar launches the 'Secret Diary of a MagicBlock Participant' challenge. Write to the author in private messages for a personal diary.",
+            image: "challenges/secret-diary.webp",
+            authorAvatars: ["avatars/garbar.jpg"],
+            authorNames: ["Garbar"],
+            tweetLink: "https://x.com/garbar27/status/2011697269150793862",
+            hashtags: ["#MagicBlock", "#Community"]
+        },
+        {
+            id: 4,
+            emoji: "🧙‍♂️",
+            title: "The Wizard's Ephemeral Block",
+            description: "Continue the story of a wizard who was able to touch a mysterious ephemeral block. Show what doors have opened for him.",
+            image: "challenges/wizards-block.webp",
+            authorAvatars: ["avatars/saiho.jpg"],
+            authorNames: ["Saiho"],
+            tweetLink: "https://x.com/saihorhys/status/2011531009607467137?s=20",
+            hashtags: ["#MagicBlock", "#Storytelling"]
+        },
+        {
+            id: 5,
+            emoji: "📸",
+            title: "Random Picture with Magic",
+            description: "Choose a random photo from the gallery, explain what you are doing, add a magical mascot. Example from the author: 'Tried to learn snowboarding for the first time'.",
+            image: "challenges/random-photo.webp",
+            authorAvatars: ["avatars/cryptoshi.jpg"],
+            authorNames: ["Cryptoshi | Bulk"],
+            tweetLink: "https://x.com/cryptoshi_eth/status/2010583869851152841",
+            hashtags: ["#MagicBlock", "#PhotoChallenge"]
+        },
+        {
+            id: 6,
+            emoji: "🧙‍♂️",
+            title: "Build Your Wizard Challenge",
+            description: "Build your unique Wizard! Add 4 magical items to the template, explain their meaning in a tweet.",
+            image: "challenges/build-wizard.webp",
+            authorAvatars: ["avatars/crypto-viktor.jpg"],
+            authorNames: ["Crypto Viktor"],
+            tweetLink: "https://x.com/0xCryptoViktor_/status/2011714581974986854?s=20",
+            hashtags: ["#MagicBlock", "#WizardChallenge"]
+        },
+        {
+            id: 7,
+            emoji: "🏆",
+            title: "Community Certificate Challenge",
+            description: "I have created a certificate for the MagicBlock community that will show your dedication. However, you will also need to answer 3 quiz questions that only the most dedicated members of the community will be able to answer correctly.",
+            image: "challenges/pfp-generatorr.webp",
+            authorAvatars: ["avatars/garbar.jpg"],
+            authorNames: ["Garbar"],
+            tweetLink: "https://x.com/garbar27/status/2013172329266758023",
+            hashtags: ["#MagicBlock", "#Certificate", "#Quiz"],
+            specialNote: "Quiz link: https://community-certificate-vercel.vercel.app"
+        },
+        {
+            id: 8,
+            emoji: "✨",
+            title: "MagicBlock Profile Picture Generator",
+            description: "We built a website with @0xCryptoViktor_ where you can create MagicBlock-style profile pictures. Try it out and share your feedback!",
+            image: "challenges/pfp-generator.webp",
+            authorAvatars: ["avatars/cryptoshi.jpg", "avatars/crypto-viktor.jpg"],
+            authorNames: ["Cryptoshi | Bulk", "@0xCryptoViktor_"],
+            tweetLink: "https://x.com/cryptoshi_eth/status/2013491690124824714",
+            specialNote: "https://magicblock-pfp-generator.netlify.app",
+            hashtags: ["#MagicBlock", "#PFP", "#Generator", "#WebApp"]
+        }
+    ];
 
     const eventTemplates = t.communityPage.title === "Сообщество" ? [
-
         {
             id: 8,
             emoji: "♟️",
             title: "Cross Community Chess Tourney",
             description: "Турнир по шахматам с участием пяти проектов: Fogochain, Raiku, Pyth, SOON и Magicblock. Соревнуйтесь с другими комьюнити и выигрывайте призы!",
-            baseDate: new Date(2026, 0, 30, 15, 0, 0), // 30 декабря 2025, 12:00 UTC
-            frequency: "once", // ОДНОРАЗОВЫЙ
+            baseDate: new Date(2026, 0, 30, 15, 0, 0),
+            frequency: "once",
             discordLink: "https://discord.gg/magicblock",
             roleMention: "@All",
             participants: 150,
             image: "/events/chess-tourney.jpg",
             author: "MagicBlock Community",
             authorAvatar: "/avatars/mgb intern.jpg",
-            scheduleNote: "Разовый турнир - 30 декабря 2025",       
+            scheduleNote: "Разовый турнир - 30 декабря 2025",
         },
         {
             id: 9,
             emoji: "🎮",
             title: "Tetris Battle Royale",
             description: "Классический тетрис в формате PvP battle royale. Играйте друг против друга, выживает сильнейший!",
-            baseDate: new Date(2026, 0, 30, 20, 0, 0), // 30 декабря 2025, 17:00 UTC
-            frequency: "once", // ОДНОРАЗОВЫЙ
+            baseDate: new Date(2026, 0, 30, 20, 0, 0),
+            frequency: "once",
             discordLink: "https://discord.gg/magicblock",
             roleMention: "@Gamers",
             participants: 80,
@@ -1094,7 +1165,6 @@ const CommunityPage = ({ t }) => {
             authorAvatar: "/avatars/mgb intern.jpg",
             scheduleNote: "Разовый ивент - 30 декабря 2025",
         },
-
         {
             id: 1,
             emoji: "☕",
@@ -1201,38 +1271,36 @@ const CommunityPage = ({ t }) => {
             scheduleNote: "Повторяется ежемесячно (первый четверг)"
         }
     ] : [
-
-            {
-                id: 8,
-                emoji: "♟️",
-                title: "Cross Community Chess Tourney",
-                description: "Chess tournament featuring five projects: Fogochain, Raiku, Pyth, SOON, and Magicblock. Compete with other communities and win prizes!",
-                baseDate: new Date(2026, 0, 30, 15, 0, 0), // December 30, 2025, 12:00 UTC
-                frequency: "once", // ONE-TIME
-                discordLink: "https://discord.gg/magicblock",
-                roleMention: "@All",
-                participants: 150,
-                image: "/events/chess-tourney.jpg",
-                author: "MagicBlock Community",
-                authorAvatar: "/avatars/mgb intern.jpg",
-                scheduleNote: "One-time tournament - December 30, 2025",
-            },
-            {
-                id: 9,
-                emoji: "🎮",
-                title: "Tetris Battle Royale",
-                description: "Good old classic tetris but in PvP battle royale format. Play against each other, only the strongest survives!",
-                baseDate: new Date(2026, 0, 30, 20, 0, 0), // December 30, 2025, 17:00 UTC
-                frequency: "once", // ONE-TIME
-                discordLink: "https://discord.gg/magicblock",
-                roleMention: "@Gamers",
-                participants: 80,
-                image: "/events/tetris-battle.jpg",
-                author: "MagicBlock Community",
-                authorAvatar: "/avatars/mgb intern.jpg",
-                scheduleNote: "One-time event - December 30, 2025",
-            },
-
+        {
+            id: 8,
+            emoji: "♟️",
+            title: "Cross Community Chess Tourney",
+            description: "Chess tournament featuring five projects: Fogochain, Raiku, Pyth, SOON, and Magicblock. Compete with other communities and win prizes!",
+            baseDate: new Date(2026, 0, 30, 15, 0, 0),
+            frequency: "once",
+            discordLink: "https://discord.gg/magicblock",
+            roleMention: "@All",
+            participants: 150,
+            image: "/events/chess-tourney.jpg",
+            author: "MagicBlock Community",
+            authorAvatar: "/avatars/mgb intern.jpg",
+            scheduleNote: "One-time tournament - December 30, 2025",
+        },
+        {
+            id: 9,
+            emoji: "🎮",
+            title: "Tetris Battle Royale",
+            description: "Good old classic tetris but in PvP battle royale format. Play against each other, only the strongest survives!",
+            baseDate: new Date(2026, 0, 30, 20, 0, 0),
+            frequency: "once",
+            discordLink: "https://discord.gg/magicblock",
+            roleMention: "@Gamers",
+            participants: 80,
+            image: "/events/tetris-battle.jpg",
+            author: "MagicBlock Community",
+            authorAvatar: "/avatars/mgb intern.jpg",
+            scheduleNote: "One-time event - December 30, 2025",
+        },
         {
             id: 1,
             emoji: "☕",
@@ -1344,7 +1412,6 @@ const CommunityPage = ({ t }) => {
         const now = new Date();
         const eventDate = new Date(baseDate);
 
-        // Для одноразовых событий - возвращаем именно указанную дату
         if (frequency === 'once') {
             return eventDate;
         }
@@ -1656,75 +1723,6 @@ const EventCard = ({ event, community, t }) => {
                 <h3 className="event-title">{event.title}</h3>
                 <p className="event-description">{event.description}</p>
 
-                {/* Дополнительная информация для специальных ивентов */}
-                {event.specialInfo && (
-                    <div className="special-event-info">
-                        {/* Для Chess Tourney */}
-                        {event.title === "Cross Community Chess Tourney" && (
-                            <>
-                                <div className="special-section">
-                                    <h4>{_isRussian ? "Проекты-участники:" : "Participating Projects:"}</h4>
-                                    <div className="projects-grid">
-                                        {event.specialInfo.projects.map((project, idx) => (
-                                            <a
-                                                key={idx}
-                                                href={project.discord}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="project-link"
-                                            >
-                                                <span className="project-name">{project.name}</span>
-                                            </a>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="special-section">
-                                    <h4>{_isRussian ? "Призовой фонд:" : "Prize Pool:"}</h4>
-                                    <ul className="prize-list">
-                                        {event.specialInfo.prizePool.map((prize, idx) => (
-                                            <li key={idx}>{prize}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                <div className="special-section">
-                                    <h4>{_isRussian ? "Правила:" : "Rules:"}</h4>
-                                    <ul className="rules-list">
-                                        {event.specialInfo.rules.map((rule, idx) => (
-                                            <li key={idx}>{rule}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </>
-                        )}
-
-                        {/* Для Tetris Battle */}
-                        {event.title === "Tetris Battle Royale" && (
-                            <>
-                                <div className="special-section">
-                                    <h4>{_isRussian ? "Как присоединиться:" : "How to Join:"}</h4>
-                                    <ul className="requirements-list">
-                                        {event.specialInfo.requirements.map((req, idx) => (
-                                            <li key={idx}>{req}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                <div className="special-section">
-                                    <h4>{_isRussian ? "Правила игры:" : "Game Rules:"}</h4>
-                                    <ul className="rules-list">
-                                        {event.specialInfo.rules.map((rule, idx) => (
-                                            <li key={idx}>{rule}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </>
-                        )}
-                    </div>
-                )}
-
-                {/* ВОТ ЭТУ СЕКЦИЮ ДОБАВЛЯЕМ/ЗАМЕНЯЕМ */}
                 <div className="event-schedule-note">
                     <span className="schedule-note-icon">
                         {event.frequency === 'once' ? '📅' : '🔄'}
@@ -1752,46 +1750,6 @@ const EventCard = ({ event, community, t }) => {
                             <span className="detail-value">{event.roleMention}</span>
                         </div>
                     </div>
-
-                    {/* Ссылки для регистрации */}
-                    {event.specialInfo?.registrationLink && (
-                        <div className="event-detail">
-                            <span className="detail-icon">🔗</span>
-                            <div className="detail-content">
-                                <span className="detail-label">
-                                    {_isRussian ? "Регистрация:" : "Registration:"}
-                                </span>
-                                <a
-                                    href={event.specialInfo.registrationLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="detail-link"
-                                >
-                                    {_isRussian ? "Ссылка" : "Link"}
-                                </a>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Ссылка на Discord событие для Tetris */}
-                    {event.specialInfo?.discordEventLink && (
-                        <div className="event-detail">
-                            <span className="detail-icon">🔔</span>
-                            <div className="detail-content">
-                                <span className="detail-label">
-                                    {_isRussian ? "Напоминание:" : "Reminder:"}
-                                </span>
-                                <a
-                                    href={event.specialInfo.discordEventLink}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="detail-link"
-                                >
-                                    {_isRussian ? "Discord событие" : "Discord event"}
-                                </a>
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <div className="event-actions">
@@ -1807,31 +1765,17 @@ const EventCard = ({ event, community, t }) => {
                         </svg>
                     </a>
 
-                    {event.specialInfo?.lobbyChannel ? (
-                        <a
-                            href={event.specialInfo.lobbyChannel}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="event-action-btn reminder-btn"
-                        >
-                            <span>{_isRussian ? "Лобби" : "Lobby"}</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                            </svg>
-                        </a>
-                    ) : (
-                        <a
-                            href={event.discordLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="event-action-btn reminder-btn"
-                        >
-                            <span>{community.setReminder}</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                            </svg>
-                        </a>
-                    )}
+                    <a
+                        href={event.discordLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="event-action-btn reminder-btn"
+                    >
+                        <span>{community.setReminder}</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        </svg>
+                    </a>
                 </div>
 
                 <div className="event-motivation">
@@ -3458,6 +3402,607 @@ const QuizPage = ({ t }) => {
                     </div>
                 </div>
             )}
+        </div>
+    );
+};
+
+const PodiumCard = ({ player, getRankIcon, getScoreBadge, hallOfFame }) => {
+    const isRussian = hallOfFame.title === "Зал Славы MagicBlock Quiz";
+
+    return (
+        <div className={`podium-card rank-${player.rank} ${player.isPlaceholder ? 'placeholder' : ''}`}>
+            <div className="podium-rank">
+                <span className="rank-icon-large">{getRankIcon(player.rank)}</span>
+            </div>
+
+            <div className="podium-avatar-container">
+                <img
+                    src={player.avatar}
+                    alt={player.username}
+                    className="podium-avatar"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0iIzJBMkEyQSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjE1IiBmaWxsPSIjNEM0QzRDIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI3MCIgcj0iMjAiIGZpbGw9IiM0QzRDNEMiLz48dGV4dCB4PSI1MCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI0ZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPj88L3RleHQ+PC9zdmc+";
+                    }}
+                />
+                {player.isPlaceholder && (
+                    <div className="placeholder-overlay">
+                        <span className="overlay-text">{isRussian ? "Свободно" : "Available"}</span>
+                    </div>
+                )}
+            </div>
+
+            <div className="podium-info">
+                <h3 className={`podium-username ${player.isPlaceholder ? 'placeholder' : ''}`}>
+                    {player.isPlaceholder ? (isRussian ? "Место свободно!" : "Spot Available!") : player.username}
+                </h3>
+                <div className="podium-score">
+                    {getScoreBadge(player.score, player.isPlaceholder)}
+                </div>
+                <div className="podium-meta">
+                    <span className="meta-item">📅 {player.date}</span>
+                    <span className="meta-item">⏰ {player.time}</span>
+                </div>
+            </div>
+
+            <button className="podium-action-btn disabled" disabled={player.isPlaceholder}>
+                {player.isPlaceholder ? (isRussian ? "Ожидаем участника" : "Waiting for participant") : hallOfFame.viewTwitter}
+            </button>
+
+            {player.isPlaceholder && (
+                <div className="placeholder-hint">
+                    <span className="hint-icon">👆</span>
+                    <span className="hint-text">{isRussian ? "Может быть вашим!" : "Could be yours!"}</span>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Выносим CategorySection за пределы HallOfFamePage
+const CategorySection = ({ title, players, icon, hallOfFame, getRankIcon, getScoreBadge, placesCount }) => {
+    const isRussian = hallOfFame.title === "Зал Славы MagicBlock Quiz";
+    const topThree = players.slice(0, 3);
+    const emptyPlaces = placesCount - players.filter(p => !p.isPlaceholder).length;
+
+    return (
+        <div className="hof-category-section hub-anim-reveal-up">
+            <h2 className="category-title">
+                <span className="category-icon">{icon}</span>
+                {title}
+                {emptyPlaces > 0 && (
+                    <span className="places-badge">{emptyPlaces} {isRussian ? "свободных мест" : "spots available"}</span>
+                )}
+            </h2>
+
+            <div className="category-description">
+                <p>
+                    {players.filter(p => !p.isPlaceholder).length === 0
+                        ? (isRussian
+                            ? "🎯 Здесь будут первые 3 участника, получивших этот результат. Места ждут своих героев!"
+                            : "🎯 Here will be the first 3 participants who achieved this result. Spots are waiting for their heroes!")
+                        : (isRussian
+                            ? "🏅 Топ-3 участников с лучшим результатом в этой категории"
+                            : "🏅 Top 3 participants with the best results in this category")
+                    }
+                </p>
+            </div>
+
+            {/* Пьедестал для топ-3 */}
+            <div className="category-podium">
+                {topThree.map((player) => (
+                    <div key={player.id} className={`category-podium-card rank-${player.rank} ${player.isPlaceholder ? 'placeholder' : ''}`}>
+                        <div className="podium-rank-small">
+                            <span className="rank-icon-small">{getRankIcon(player.rank)}</span>
+                        </div>
+                        <div className="podium-avatar-small">
+                            <img
+                                src={player.avatar}
+                                alt={player.username}
+                                className="avatar-small"
+                            />
+                            {player.isPlaceholder && (
+                                <div className="placeholder-indicator">?</div>
+                            )}
+                        </div>
+                        <div className="podium-info-small">
+                            <h4 className={player.isPlaceholder ? 'placeholder' : ''}>
+                                {player.isPlaceholder ? (isRussian ? "Свободно" : "Available") : player.username}
+                            </h4>
+                            <div className="score-small">
+                                {getScoreBadge(player.score, player.isPlaceholder)}
+                            </div>
+                            <div className="meta-small">
+                                <span>📅 {player.date}</span>
+                                <span>⏰ {player.time}</span>
+                            </div>
+                        </div>
+                        <button
+                            className="action-btn-small disabled"
+                            disabled={player.isPlaceholder}
+                            title={player.isPlaceholder ? (isRussian ? "Место свободно" : "Spot available") : hallOfFame.viewTwitter}
+                        >
+                            {player.isPlaceholder ? "?" : "👁️"}
+                        </button>
+                    </div>
+                ))}
+            </div>
+
+            {/* Сообщение для свободных мест */}
+            {players.filter(p => !p.isPlaceholder).length === 0 && (
+                <div className="empty-category-message">
+                    <div className="empty-icon">🎯</div>
+                    <h3>{isRussian ? "Эта категория пока пуста" : "This category is empty for now"}</h3>
+                    <p>{isRussian
+                        ? `Станьте первым, кто получит ${title.toLowerCase()} и займет почетное место на пьедестале!`
+                        : `Become the first to achieve ${title.toLowerCase()} and take a place on the podium!`
+                    }</p>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const HallOfFamePage = ({ t }) => {
+    const hallOfFame = t.hallOfFamePage;
+    const [activeCategory, setActiveCategory] = useState('all');
+
+    // Определяем язык для условного рендеринга
+    const isRussian = t.hallOfFamePage.title === "Зал Славы MagicBlock Quiz";
+
+    // Демо-данные - будут заменены реальными
+    const playersData = {
+        // Первые 3 завершивших (любой результат)
+        firstCompleters: [
+            {
+                id: 1,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 0,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 1,
+                category: "first",
+                isPlaceholder: true
+            },
+            {
+                id: 2,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 0,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 2,
+                category: "first",
+                isPlaceholder: true
+            },
+            {
+                id: 3,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 0,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 3,
+                category: "first",
+                isPlaceholder: true
+            }
+        ],
+        // 10/10 участники
+        perfect10: [
+            {
+                id: 4,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 10,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 1,
+                category: "perfect10",
+                isPlaceholder: true
+            },
+            {
+                id: 5,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 10,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 2,
+                category: "perfect10",
+                isPlaceholder: true
+            },
+            {
+                id: 6,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 10,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 3,
+                category: "perfect10",
+                isPlaceholder: true
+            }
+        ],
+        // 9/10 участники
+        excellent9: [
+            {
+                id: 7,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 9,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 1,
+                category: "excellent9",
+                isPlaceholder: true
+            },
+            {
+                id: 8,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 9,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 2,
+                category: "excellent9",
+                isPlaceholder: true
+            },
+            {
+                id: 9,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 9,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 3,
+                category: "excellent9",
+                isPlaceholder: true
+            }
+        ],
+        // 8/10 участники
+        great8: [
+            {
+                id: 10,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 8,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 1,
+                category: "great8",
+                isPlaceholder: true
+            },
+            {
+                id: 11,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 8,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 2,
+                category: "great8",
+                isPlaceholder: true
+            },
+            {
+                id: 12,
+                username: isRussian ? "@место_свободно" : "@spot_available",
+                displayName: "???",
+                avatar: "/avatars/placeholder.jpg",
+                score: 8,
+                date: isRussian ? "--.--.----" : "--/--/----",
+                time: "--:--",
+                twitterPost: "#",
+                certificateUrl: "#",
+                rank: 3,
+                category: "great8",
+                isPlaceholder: true
+            }
+        ]
+    };
+
+    const getRankIcon = (rank) => {
+        switch (rank) {
+            case 1: return "🥇";
+            case 2: return "🥈";
+            case 3: return "🥉";
+            default: return `#${rank}`;
+        }
+    };
+
+    const getScoreBadge = (score, isPlaceholder) => {
+        if (isPlaceholder) {
+            return <span className="score-badge placeholder">???</span>;
+        }
+        if (score === 10) return <span className="score-badge perfect">🏆 10/10</span>;
+        if (score === 9) return <span className="score-badge excellent">🥈 9/10</span>;
+        return <span className="score-badge great">🥉 8/10</span>;
+    };
+
+    return (
+        <div className="page hub-anim-fade-in">
+            <div className="hall-of-fame-header">
+                <h1>{hallOfFame.title}</h1>
+                <p className="hall-of-fame-subtitle">
+                    {hallOfFame.subtitle}
+                </p>
+
+                {/* Баннер с предупреждением */}
+                <div className="demo-banner hub-anim-reveal-up">
+                    <div className="demo-banner-content">
+                        <span className="banner-icon">⚠️</span>
+                        <div className="banner-text">
+                            <strong>{isRussian ? "Внимание:" : "Attention:"}</strong> {isRussian
+                                ? "Это демонстрационные данные. Все места свободны! Первые участники появятся здесь после начала челленджа."
+                                : "This is demo data. All spots are available! First participants will appear here after the challenge starts."
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Статистика с пометкой "демо" */}
+            <div className="hof-stats-demo hub-anim-reveal-up" style={{ animationDelay: '0.1s' }}>
+                <div className="stat-card demo">
+                    <div className="stat-icon">👥</div>
+                    <div className="stat-content">
+                        <h3>0</h3>
+                        <p>{hallOfFame.totalPlayers}</p>
+                        <span className="demo-badge">{isRussian ? "Ожидаем участников" : "Waiting for participants"}</span>
+                    </div>
+                </div>
+                <div className="stat-card demo">
+                    <div className="stat-icon">📊</div>
+                    <div className="stat-content">
+                        <h3>0.0</h3>
+                        <p>{hallOfFame.averageScore}</p>
+                        <span className="demo-badge">{isRussian ? "Пока нет данных" : "No data yet"}</span>
+                    </div>
+                </div>
+                <div className="stat-card demo">
+                    <div className="stat-icon">🏆</div>
+                    <div className="stat-content">
+                        <h3>0</h3>
+                        <p>{isRussian ? "Свободных мест" : "Available spots"}</p>
+                        <span className="demo-badge">12 {isRussian ? "мест ждут вас!" : "spots waiting for you!"}</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Фильтры по категориям */}
+            <div className="hof-category-filters hub-anim-reveal-up" style={{ animationDelay: '0.2s' }}>
+                <div className="filter-buttons">
+                    <button
+                        className={`category-filter-btn ${activeCategory === 'all' ? 'active' : ''}`}
+                        onClick={() => setActiveCategory('all')}
+                    >
+                        <span className="filter-icon">🏆</span>
+                        {hallOfFame.allScores}
+                    </button>
+                    <button
+                        className={`category-filter-btn ${activeCategory === 'first' ? 'active' : ''}`}
+                        onClick={() => setActiveCategory('first')}
+                    >
+                        <span className="filter-icon">🚀</span>
+                        {hallOfFame.firstCompleters}
+                    </button>
+                    <button
+                        className={`category-filter-btn ${activeCategory === 'perfect10' ? 'active' : ''}`}
+                        onClick={() => setActiveCategory('perfect10')}
+                    >
+                        <span className="filter-icon">🏆</span>
+                        {hallOfFame.score10}
+                    </button>
+                    <button
+                        className={`category-filter-btn ${activeCategory === 'excellent9' ? 'active' : ''}`}
+                        onClick={() => setActiveCategory('excellent9')}
+                    >
+                        <span className="filter-icon">🥈</span>
+                        {hallOfFame.score9}
+                    </button>
+                    <button
+                        className={`category-filter-btn ${activeCategory === 'great8' ? 'active' : ''}`}
+                        onClick={() => setActiveCategory('great8')}
+                    >
+                        <span className="filter-icon">🥉</span>
+                        {hallOfFame.score8}
+                    </button>
+                </div>
+            </div>
+
+            {/* Пьедесталы для первых завершивших */}
+            {(activeCategory === 'all' || activeCategory === 'first') && (
+                <div className="hof-podiums-section hub-anim-reveal-up" style={{ animationDelay: '0.3s' }}>
+                    <h2 className="podiums-title">
+                        <span className="title-icon">🚀</span>
+                        {hallOfFame.firstCompleters}
+                        <span className="places-badge">3 {isRussian ? "свободных места" : "spots available"}</span>
+                    </h2>
+
+                    <div className="podiums-container">
+                        {playersData.firstCompleters.map((player) => (
+                            <PodiumCard
+                                key={player.id}
+                                player={player}
+                                getRankIcon={getRankIcon}
+                                getScoreBadge={getScoreBadge}
+                                hallOfFame={hallOfFame}
+                            />
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Категории по очкам */}
+            {(activeCategory === 'all' || activeCategory === 'perfect10') && (
+                <CategorySection
+                    title={hallOfFame.score10}
+                    players={playersData.perfect10}
+                    icon="🏆"
+                    hallOfFame={hallOfFame}
+                    getRankIcon={getRankIcon}
+                    getScoreBadge={getScoreBadge}
+                    placesCount={3}
+                />
+            )}
+
+            {(activeCategory === 'all' || activeCategory === 'excellent9') && (
+                <CategorySection
+                    title={hallOfFame.score9}
+                    players={playersData.excellent9}
+                    icon="🥈"
+                    hallOfFame={hallOfFame}
+                    getRankIcon={getRankIcon}
+                    getScoreBadge={getScoreBadge}
+                    placesCount={3}
+                />
+            )}
+
+            {(activeCategory === 'all' || activeCategory === 'great8') && (
+                <CategorySection
+                    title={hallOfFame.score8}
+                    players={playersData.great8}
+                    icon="🥉"
+                    hallOfFame={hallOfFame}
+                    getRankIcon={getRankIcon}
+                    getScoreBadge={getScoreBadge}
+                    placesCount={3}
+                />
+            )}
+
+            {/* Как попасть в зал славы */}
+            <div className="hof-how-to-join hub-anim-reveal-up" style={{ animationDelay: '0.6s' }}>
+                <div className="how-to-card">
+                    <h3>🎯 {isRussian ? "Как занять место в Зале Славы?" : "How to get a spot in the Hall of Fame?"}</h3>
+
+                    <div className="steps-container">
+                        <div className="step">
+                            <div className="step-header">
+                                <span className="step-number">1</span>
+                                <h4>{isRussian ? "Пройти квиз MagicBlock" : "Take the MagicBlock Quiz"}</h4>
+                            </div>
+                            <p>{isRussian
+                                ? "Ответьте на 10 вопросов о MagicBlock на странице квиза"
+                                : "Answer 10 questions about MagicBlock on the quiz page"
+                            }</p>
+                        </div>
+
+                        <div className="step">
+                            <div className="step-header">
+                                <span className="step-number">2</span>
+                                <h4>{isRussian ? "Получить сертификат" : "Get your certificate"}</h4>
+                            </div>
+                            <p>{isRussian
+                                ? "Правильно ответьте минимум на 8 вопросов для получения сертификата"
+                                : "Answer at least 8 questions correctly to get your certificate"
+                            }</p>
+                        </div>
+
+                        <div className="step">
+                            <div className="step-header">
+                                <span className="step-number">3</span>
+                                <h4>{isRussian ? "Поделиться в Twitter" : "Share on Twitter"}</h4>
+                            </div>
+                    
+
+                            {/* Кнопка с ссылкой на твит */}
+                            <div className="twitter-action-section">
+                                <p className="twitter-instruction">
+                                    <strong>📌 {isRussian ? "ВАЖНО:" : "IMPORTANT:"}</strong> {isRussian
+                                        ? "Сделайте quote retweet (цитатный ретвит) этого поста с вашим сертификатом и отметьте меня @cryptoo_tor"
+                                        : "Make a quote retweet of this post with your certificate and mention me @cryptoo_tor"
+                                    }
+                                </p>
+
+                                <a
+                                    href="https://x.com/cryptoo_tor/status/your-post-id"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="twitter-quote-button"
+                                >
+                                    <span className="button-icon">🔗</span>
+                                    <span className="button-text">{isRussian ? "Ссылка на пост для quote retweet" : "Link for quote retweet"}</span>
+                                    <span className="button-arrow">→</span>
+                                </a>
+
+                               
+                            </div>
+                        </div>
+
+                        <div className="step">
+                            <div className="step-header">
+                                <span className="step-number">4</span>
+                                <h4>{isRussian ? "Попасть в таблицу" : "Get on the leaderboard"}</h4>
+                            </div>
+                            <p>{isRussian
+                                ? "Я добавлю вас в таблицу лидеров после проверки вашего поста"
+                                : "I'll add you to the leaderboard after verifying your post"
+                            }</p>
+                        </div>
+                    </div>
+
+                    <div className="important-note">
+                        <span className="note-icon">💡</span>
+                        <div className="note-content">
+                            <strong>{isRussian ? "Важно:" : "Important:"}</strong> {isRussian
+                                ? "Места распределяются по времени публикации в Twitter. Чем раньше вы поделитесь результатом, тем выше ваш шанс попасть в топ-3 своей категории!"
+                                : "Spots are allocated based on Twitter post time. The earlier you share your result, the higher your chance of getting into the top 3 of your category!"
+                            }
+                        </div>
+                    </div>
+
+                    <div className="cta-section">
+                        <p className="cta-text">🎁 <strong>{isRussian ? "Первые 12 участников" : "First 12 participants"}</strong> {isRussian
+                            ? "получат особое признание в сообществе!"
+                            : "will receive special recognition in the community!"
+                        }</p>
+                        <a
+                            href="#quiz"
+                            className="cta-button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                // Здесь можно добавить навигацию на страницу квиза
+                                window.location.hash = 'quiz';
+                            }}
+                        >
+                            🚀 {isRussian ? "Пройти квиз сейчас!" : "Take the quiz now!"}
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
