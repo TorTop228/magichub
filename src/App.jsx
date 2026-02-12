@@ -1,9 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState} from 'react';
 import './styles/hub-styles.css';
 import './HallOfFame.css';
-import HTML2Canvas from 'html2canvas';
 import CharacterCreator from './CharacterCreator';
-import HallOfFame from './HallOfFame';
 
 const AVATAR = "/QXbbs7jJ_400x400.jpg";
 const MB_LOGO = "/stEObS-j_400x400.jpg";
