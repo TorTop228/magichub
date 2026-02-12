@@ -1,8 +1,72 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './styles/hub-styles.css';
+import './HallOfFame.css';
+import HTML2Canvas from 'html2canvas';
+import CharacterCreator from './CharacterCreator';
+import HallOfFame from './HallOfFame';
 
 const AVATAR = "/QXbbs7jJ_400x400.jpg";
 const MB_LOGO = "/stEObS-j_400x400.jpg";
+
+// ===== ASSETS ДЛЯ КОНСТРУКТОРА =====
+const ASSETS = {
+    backgrounds: [
+        { id: 1, src: '/images/backgrounds/1.png' },
+        { id: 2, src: '/images/backgrounds/2.png' },
+        { id: 3, src: '/images/backgrounds/3.png' },
+        { id: 4, src: '/images/backgrounds/4.png' },
+    ],
+    base: [
+        { id: 1, src: '/images/base/1.png' },
+        { id: 2, src: '/images/base/2.png' },
+        { id: 3, src: '/images/base/3.png' },
+        { id: 4, src: '/images/base/4.png' }
+    ],
+    body: [
+        { id: 1, src: '/images/body/1.png' },
+        { id: 2, src: '/images/body/2.png' },
+        { id: 3, src: '/images/body/3.png' },
+        { id: 4, src: '/images/body/4.png' }
+    ],
+    clothes: [
+        { id: 1, src: '/images/clothes/1.png' },
+        { id: 2, src: '/images/clothes/2.png' },
+        { id: 3, src: '/images/clothes/3.png' },
+        { id: 4, src: '/images/clothes/4.png' },
+        { id: 5, src: '/images/clothes/5.png' },
+        { id: 6, src: '/images/clothes/6.png' },
+        { id: 7, src: '/images/clothes/7.png' },
+        { id: 8, src: '/images/clothes/8.png' }
+    ],
+    face: [
+        { id: 1, src: '/images/face/1.png' },
+        { id: 2, src: '/images/face/2.png' },
+        { id: 3, src: '/images/face/3.png' },
+        { id: 4, src: '/images/face/4.png' }
+    ],
+    hair: [
+        { id: 1, src: '/images/hair/1.png' },
+        { id: 2, src: '/images/hair/2.png' },
+        { id: 3, src: '/images/hair/3.png' },
+        { id: 4, src: '/images/hair/4.png' },
+        { id: 5, src: '/images/hair/5.png' },
+        { id: 6, src: '/images/hair/6.png' },
+        { id: 7, src: '/images/hair/7.png' },
+        { id: 8, src: '/images/hair/8.png' },
+        { id: 9, src: '/images/hair/9.png' }
+    ],
+    hat: [
+        { id: 1, src: '/images/hat/1.png' },
+        { id: 2, src: '/images/hat/2.png' },
+        { id: 3, src: '/images/hat/3.png' }
+    ],
+    hearts: [
+        { id: 1, src: '/images/hearts/1.png' },
+        { id: 2, src: '/images/hearts/2.png' },
+        { id: 3, src: '/images/hearts/3.png' },
+        { id: 4, src: '/images/hearts/4.png' }
+    ]
+};
 
 const translations = {
     ru: {
@@ -230,6 +294,33 @@ const translations = {
             filterByScore: "Фильтровать по очкам",
             viewCertificate: "Посмотреть сертификат",
             viewTwitter: "Посмотреть пост"
+        },
+
+        valentineTab: "Валентинка",
+        valentinePage: {
+            title: "Конструктор персонажей Magic Block",
+            subtitle: "Создай уникального персонажа с магическим дизайном",
+            randomButton: "🎲 Рандом",
+            background: "Background",
+            base: "Base",
+            body: "Body",
+            face: "Face",
+            clothes: "Clothes",
+            hair: "Hair",
+            hat: "Hat",
+            hearts: "Hearts",
+            fromPlaceholder: " From:",
+            toPlaceholder: "To:",
+            elements: "элементов",
+            selected: "Выбрано",
+            placeholderTo: "Введите имя...",
+            placeholderFrom: "Ваше имя...",
+            generateSuccess: "Валентинка создана!",
+            generating: "Генерация изображения...",
+            downloadSuccess: "Изображение скачано!",
+            shareSuccess: "Ссылка скопирована в буфер обмена!",
+            loading: "Загрузка изображений...",
+            valentineCreator: "ВАЛЕНТИНКА"
         }
     },
     en: {
@@ -265,7 +356,7 @@ const translations = {
         newsDesc: "MagicBlock news",
         communityCard: "Community",
         communityDesc: "Challenges, events and info",
-        certificateText: "{username} успешно прошел тестирование по MagicBlock, продемонстрировав знания о Ephemeral Rollups и экосистеме Solana.",
+        certificateText: "{username} successfully passed the MagicBlock test, demonstrating knowledge of Ephemeral Rollups and the Solana ecosystem.",
 
         footerText: "Independent fan hub • 2026 • Tor00_1",
         twitterLink: "@cryptoo_tor",
@@ -458,6 +549,32 @@ const translations = {
             filterByScore: "Filter by Score",
             viewCertificate: "View Certificate",
             viewTwitter: "View Post"
+        },
+
+        valentineTab: "Valentine's day",
+        valentinePage: {
+            title: "Magic Block Character Creator",
+            subtitle: "Create a unique character with magical design",
+            randomButton: "🎲 Random",
+            background: "Background",
+            base: "Base",
+            body: "Body",
+            face: "Face",
+            clothes: "Clothes",
+            hair: "Hair",
+            hat: "Hat",
+            hearts: "Hearts",
+            fromPlaceholder: " From:",
+            toPlaceholder: "To:",
+            elements: "elements",
+            selected: "Selected",
+            placeholderTo: "Enter name...",
+            placeholderFrom: "Your name...",
+            generateSuccess: "Valentine created!",
+            generating: "Generating image...",
+            downloadSuccess: "Image downloaded!",
+            shareSuccess: "Link copied to clipboard!",
+            loading: "Loading images..."
         }
     }
 };
@@ -467,12 +584,13 @@ function LanguageSelector({ onLanguageSelect }) {
 
     useEffect(() => {
         const savedLang = localStorage.getItem('magicblock_lang');
+
         if (savedLang && (savedLang === 'ru' || savedLang === 'en')) {
             onLanguageSelect(savedLang);
         }
     }, [onLanguageSelect]);
 
-    const handleLanguageSelect = (lang) => {
+    const handleLanguageSelect = function (lang) {
         localStorage.setItem('magicblock_lang', lang);
         onLanguageSelect(lang);
     };
@@ -486,7 +604,7 @@ function LanguageSelector({ onLanguageSelect }) {
                 <div className="lang-buttons">
                     <button
                         className={`lang-button ${selectedLang === 'ru' ? 'active' : ''}`}
-                        onClick={() => setSelectedLang('ru')}
+                        onClick={function () { setSelectedLang('ru'); }}
                     >
                         <span className="flag">🇷🇺</span>
                         <span>Русский</span>
@@ -494,7 +612,7 @@ function LanguageSelector({ onLanguageSelect }) {
 
                     <button
                         className={`lang-button ${selectedLang === 'en' ? 'active' : ''}`}
-                        onClick={() => setSelectedLang('en')}
+                        onClick={function () { setSelectedLang('en'); }}
                     >
                         <span className="flag">🇺🇸</span>
                         <span>English</span>
@@ -503,7 +621,11 @@ function LanguageSelector({ onLanguageSelect }) {
 
                 <button
                     className="lang-continue-btn"
-                    onClick={() => selectedLang && handleLanguageSelect(selectedLang)}
+                    onClick={function () {
+                        if (selectedLang) {
+                            handleLanguageSelect(selectedLang);
+                        }
+                    }}
                     style={{ marginTop: '40px', padding: '15px 40px' }}
                     disabled={!selectedLang}
                 >
@@ -530,112 +652,7 @@ function HubBackground() {
     );
 }
 
-function HubApp({ t, currentLang, setCurrentLang }) {
-    const [page, setPage] = useState('home');
-    const [showQuizBadge, setShowQuizBadge] = useState(true);
-
-    const renderContent = () => {
-        switch (page) {
-            case 'home': return <HomePage setPage={setPage} t={t} showQuizBadge={showQuizBadge} setShowQuizBadge={setShowQuizBadge} />;
-            case 'magicblock': return <MagicBlockPage t={t} setPage={setPage} />;
-            case 'community': return <CommunityPage t={t} />;
-            case 'news': return <NewsPage t={t} />;
-            case 'about': return <AboutPage t={t} />;
-            case 'media': return <MediaPage t={t} />;
-            case 'quiz': return <QuizPage t={t} />;
-            case 'halloffame': return <HallOfFamePage t={t} />;
-            default: return <HomePage setPage={setPage} t={t} showQuizBadge={showQuizBadge} setShowQuizBadge={setShowQuizBadge} />;
-        }
-    };
-
-    const handleLanguageChange = (lang) => {
-        setCurrentLang(lang);
-        localStorage.setItem('magicblock_lang', lang);
-    };
-
-    return (
-        <div className="hub-shell">
-            <HubBackground />
-
-            <div className="lang-switcher">
-                <button
-                    className={`lang-btn ${currentLang === 'ru' ? 'active' : ''}`}
-                    onClick={() => handleLanguageChange('ru')}
-                >
-                    🇷🇺 RU
-                </button>
-                <button
-                    className={`lang-btn ${currentLang === 'en' ? 'active' : ''}`}
-                    onClick={() => handleLanguageChange('en')}
-                >
-                    🇺🇸 EN
-                </button>
-            </div>
-
-            <nav className="navbar">
-                <div className="nav-brand" onClick={() => setPage('home')}>
-                    <img src={MB_LOGO} alt="MB" />
-                    <span>{t.hubTitle}</span>
-                </div>
-
-                <div className="nav-links">
-                    <button onClick={() => setPage('home')} className={page === 'home' ? 'active' : ''}>
-                        {t.home}
-                    </button>
-                    <button onClick={() => setPage('magicblock')} className={page === 'magicblock' ? 'active' : ''}>
-                        {t.project}
-                    </button>
-                    <button onClick={() => setPage('community')} className={page === 'community' ? 'active' : ''}>
-                        {t.community}
-                    </button>
-                    <button onClick={() => setPage('news')} className={page === 'news' ? 'active' : ''}>
-                        {t.news}
-                    </button>
-                    <button onClick={() => setPage('media')} className={page === 'media' ? 'active' : ''}>
-                        {t.media}
-                    </button>
-                    <button onClick={() => setPage('quiz')} className={page === 'quiz' ? 'active' : ''}>
-                        {t.quizTab} {showQuizBadge && <span className="quiz-badge">🔥</span>}
-                    </button>
-                    <button onClick={() => setPage('halloffame')} className={page === 'halloffame' ? 'active' : ''}>
-                        🏆 {t.hallOfFameTab || "HALL OF FAME"}
-                    </button>
-                </div>
-
-                <div className="nav-profile" onClick={() => setPage('about')}>
-                    <span>{t.torName}</span>
-                    <img src={AVATAR} alt="Tor" />
-                </div>
-            </nav>
-
-            <main className="main-content">
-                {renderContent()}
-            </main>
-
-            <footer className="footer">
-                <div className="footer-content">
-                    <p>{t.footerText}</p>
-                    <a
-                        href="https://x.com/cryptoo_tor"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="twitter-link"
-                        title={t.twitterLink}
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
-                        </svg>
-                        <span>{t.twitterLink}</span>
-                    </a>
-                </div>
-            </footer>
-        </div>
-    );
-}
-
-const HomePage = ({ setPage, t, showQuizBadge, setShowQuizBadge }) => {
-    console.log('showQuizBadge:', showQuizBadge); // Для отладки
-
+function HomePage({ setPage, t,  setShowQuizBadge }) {
     return (
         <div className="page hub-anim-fade-in">
             <div className="intro-grid">
@@ -666,51 +683,142 @@ const HomePage = ({ setPage, t, showQuizBadge, setShowQuizBadge }) => {
                 </div>
             </div>
 
-            {/* Quiz Challenge Banner */}
-            {showQuizBadge !== false && (
-                <div className="quiz-challenge-banner hub-anim-reveal-up" style={{ animationDelay: '0.2s' }}>
-                    <div className="quiz-banner-content">
-                        <div className="quiz-banner-icon">🔥</div>
-                        <div className="quiz-banner-text">
-                            <h3>{t.quizPage.title === "Квиз MagicBlock" ? "Сейчас идет челлендж с квизом!" : "Quiz Challenge is Live Now!"}</h3>
-                            <p>{t.quizPage.title === "Квиз MagicBlock"
-                                ? "Пройди квиз и попади в Зал Славы MagicBlock! Первые участники получат особое признание."
-                                : "Take the quiz and get into MagicBlock Hall of Fame! First participants get special recognition."}</p>
-                        </div>
-                        <button
-                            className="quiz-banner-button"
-                            onClick={() => {
-                                console.log('Navigating to quiz page');
-                                setPage('quiz');
-                                if (setShowQuizBadge) {
-                                    setShowQuizBadge(false);
-                                }
-                            }}
-                        >
-                            🚀 {t.quizPage.title === "Квиз MagicBlock" ? "Пройти квиз сейчас!" : "Take the quiz now!"}
-                        </button>
-                        <button
-                            className="quiz-banner-close"
-                            onClick={() => setShowQuizBadge && setShowQuizBadge(false)}
-                        >
-                            ×
-                        </button>
+            {/* ПРОСТОЙ VALENTINE БАННЕР - ТОЧНО РАБОТАЕТ */}
+            <div
+                className="valentine-simple-banner"
+                style={{
+                    background: 'linear-gradient(90deg, #ff3366, #ff6b6b, #ff8787, #ff6b6b, #ff3366)',
+                    borderRadius: '16px',
+                    padding: '24px 32px',
+                    margin: '30px 0 40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    boxShadow: '0 10px 30px rgba(255, 51, 102, 0.3)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    position: 'relative'
+                }}
+            >
+                {/* Левая часть с сердечками */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '40px' }}>❤️</span>
+                    <div>
+                        <span style={{
+                            background: 'rgba(255,255,255,0.2)',
+                            padding: '6px 16px',
+                            borderRadius: '50px',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            color: 'white'
+                        }}>
+                            🎉 VALENTINE'S DAY
+                        </span>
                     </div>
                 </div>
-            )}
+
+                {/* Центр с текстом */}
+                <div style={{ textAlign: 'center' }}>
+                    <h2 style={{
+                        fontSize: '28px',
+                        margin: '0 0 8px 0',
+                        color: 'white',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                        fontWeight: '800'
+                    }}>
+                        {t.quizPage.title === "Квиз MagicBlock"
+                            ? "❤️ С Днём Святого Валентина! ❤️"
+                            : "❤️ Happy Valentine's Day! ❤️"}
+                    </h2>
+                    <p style={{
+                        fontSize: '16px',
+                        margin: '0',
+                        color: 'rgba(255,255,255,0.95)',
+                        maxWidth: '500px'
+                    }}>
+                        {t.quizPage.title === "Квиз MagicBlock"
+                            ? "Создай волшебную валентинку с уникальным персонажем!"
+                            : "Create a magical Valentine's card with a unique character!"}
+                    </p>
+                </div>
+
+                {/* Правая часть с кнопкой */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <button
+                        onClick={function () {
+                            setPage('valentine');
+                            if (setShowQuizBadge) setShowQuizBadge(false);
+                        }}
+                        style={{
+                            background: '#ffd700',
+                            border: 'none',
+                            padding: '14px 32px',
+                            borderRadius: '50px',
+                            fontSize: '18px',
+                            fontWeight: 'bold',
+                            color: '#2d1b1b',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            boxShadow: '0 5px 20px rgba(255, 215, 0, 0.4)',
+                            transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={e => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 10px 30px rgba(255, 215, 0, 0.6)';
+                        }}
+                        onMouseOut={e => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.4)';
+                        }}
+                    >
+                        <span style={{ fontSize: '24px' }}>🎨</span>
+                        {t.quizPage.title === "Квиз MagicBlock" ? "Создать валентинку" : "Create Valentine"}
+                        <span style={{ fontSize: '20px' }}>→</span>
+                    </button>
+
+                    <button
+                        onClick={function () {
+                            if (setShowQuizBadge) setShowQuizBadge(false);
+                        }}
+                        style={{
+                            background: 'rgba(255,255,255,0.2)',
+                            border: '1px solid rgba(255,255,255,0.4)',
+                            color: 'white',
+                            fontSize: '24px',
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                        }}
+                        onMouseOver={e => {
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.3)';
+                        }}
+                        onMouseOut={e => {
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.2)';
+                        }}
+                    >
+                        ×
+                    </button>
+                </div>
+            </div>
 
             <div className="cards-grid">
-                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.3s' }} onClick={() => setPage('magicblock')}>
+                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.3s' }} onClick={function () { setPage('magicblock'); }}>
                     <span className="icon">🧩</span>
                     <h3>{t.magicBlockCard}</h3>
                     <p>{t.magicBlockDesc}</p>
                 </div>
-                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.4s' }} onClick={() => setPage('news')}>
+                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.4s' }} onClick={function () { setPage('news'); }}>
                     <span className="icon">📰</span>
                     <h3>{t.newsCard}</h3>
                     <p>{t.newsDesc}</p>
                 </div>
-                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.5s' }} onClick={() => setPage('community')}>
+                <div className="card hub-anim-reveal-up" style={{ animationDelay: '0.5s' }} onClick={function () { setPage('community'); }}>
                     <span className="icon">👥</span>
                     <h3>{t.communityCard}</h3>
                     <p>{t.communityDesc}</p>
@@ -718,9 +826,9 @@ const HomePage = ({ setPage, t, showQuizBadge, setShowQuizBadge }) => {
             </div>
         </div>
     );
-};
+}
 
-const MagicBlockPage = ({ t, setPage }) => {
+function MagicBlockPage({ t, setPage }) {
     const magicBlock = t.magicBlockPage;
 
     return (
@@ -789,9 +897,11 @@ const MagicBlockPage = ({ t, setPage }) => {
                                 <h3>💎 {magicBlock.section3.useCase3.title}</h3>
                                 <p>{magicBlock.section3.useCase3.content}</p>
                                 <div className="finance-apps">
-                                    {magicBlock.section3.useCase3.apps.map((app, index) => (
-                                        <span key={index} className="app-tag">{app}</span>
-                                    ))}
+                                    {magicBlock.section3.useCase3.apps.map(function (app, index) {
+                                        return (
+                                            <span key={index} className="app-tag">{app}</span>
+                                        );
+                                    })}
                                 </div>
                                 <p>
                                     {magicBlock.section3.useCase3.additional}
@@ -824,7 +934,7 @@ const MagicBlockPage = ({ t, setPage }) => {
                     </div>
                     <button
                         className="quiz-cta-button"
-                        onClick={() => setPage('quiz')}
+                        onClick={function () { setPage('quiz'); }}
                     >
                         {t.quizPage.title === "Квиз MagicBlock"
                             ? "Пройти квиз →"
@@ -834,13 +944,13 @@ const MagicBlockPage = ({ t, setPage }) => {
             </div>
         </div>
     );
-};
+}
 
-const CommunityPage = ({ t }) => {
+function CommunityPage({ t }) {
     const community = t.communityPage;
     const [activeSection, setActiveSection] = useState('challenges');
 
-    const formatEventDate = (dateObj) => {
+    const formatEventDate = function (dateObj) {
         const isRussian = t.communityPage.title === "Сообщество";
 
         if (dateObj instanceof Date) {
@@ -859,6 +969,7 @@ const CommunityPage = ({ t }) => {
                 `${dayOfWeek} ${month} ${day}-го · ${hours}:${minutes}` :
                 `${dayOfWeek} ${month} ${day} · ${hours}:${minutes}`;
         }
+
         return dateObj;
     };
 
@@ -1408,7 +1519,7 @@ const CommunityPage = ({ t }) => {
         }
     ];
 
-    const getNextEventDate = (baseDate, frequency) => {
+    const getNextEventDate = function (baseDate, frequency) {
         const now = new Date();
         const eventDate = new Date(baseDate);
 
@@ -1455,7 +1566,7 @@ const CommunityPage = ({ t }) => {
         return nextDate;
     };
 
-    const events = eventTemplates.map(template => {
+    const events = eventTemplates.map(function (template) {
         const nextDate = getNextEventDate(template.baseDate, template.frequency);
         const formattedDate = formatEventDate(nextDate);
 
@@ -1480,8 +1591,14 @@ const CommunityPage = ({ t }) => {
         };
     });
 
-    const sortedEvents = [...events].sort((a, b) => a.timestamp - b.timestamp);
-    const upcomingEvents = sortedEvents.filter(event => event.status !== "past");
+    const sortedEvents = [...events].sort(function (a, b) {
+        return a.timestamp - b.timestamp;
+    });
+
+    const upcomingEvents = sortedEvents.filter(function (event) {
+        return event.status !== "past";
+    });
+
     const displayEvents = upcomingEvents.length > 0 ? upcomingEvents : sortedEvents.slice(-3);
 
     return (
@@ -1497,7 +1614,7 @@ const CommunityPage = ({ t }) => {
                 <div className="section-switcher">
                     <button
                         className={`section-tab ${activeSection === 'challenges' ? 'active' : ''}`}
-                        onClick={() => setActiveSection('challenges')}
+                        onClick={function () { setActiveSection('challenges'); }}
                     >
                         <span className="tab-emoji">🏆</span>
                         <span className="tab-text">{community.challenges}</span>
@@ -1506,7 +1623,7 @@ const CommunityPage = ({ t }) => {
 
                     <button
                         className={`section-tab ${activeSection === 'events' ? 'active' : ''}`}
-                        onClick={() => setActiveSection('events')}
+                        onClick={function () { setActiveSection('events'); }}
                     >
                         <span className="tab-emoji">🎯</span>
                         <span className="tab-text">{community.events}</span>
@@ -1518,7 +1635,7 @@ const CommunityPage = ({ t }) => {
             <div className="mobile-section-nav">
                 <button
                     className={`nav-arrow ${activeSection === 'challenges' ? 'active' : ''}`}
-                    onClick={() => setActiveSection('challenges')}
+                    onClick={function () { setActiveSection('challenges'); }}
                 >
                     <span className="arrow-icon">←</span>
                     <span className="arrow-label">{community.challenges}</span>
@@ -1526,7 +1643,7 @@ const CommunityPage = ({ t }) => {
 
                 <button
                     className={`nav-arrow ${activeSection === 'events' ? 'active' : ''}`}
-                    onClick={() => setActiveSection('events')}
+                    onClick={function () { setActiveSection('events'); }}
                 >
                     <span className="arrow-label">{community.events}</span>
                     <span className="arrow-icon">→</span>
@@ -1547,76 +1664,84 @@ const CommunityPage = ({ t }) => {
                     </div>
 
                     <div className="challenges-grid">
-                        {challenges.map((challenge) => (
-                            <div key={challenge.id} className="challenge-card hub-anim-reveal-up"
-                                style={{ animationDelay: `${0.1 * challenge.id}s` }}>
-                                <div className="challenge-image-container">
-                                    <span className="challenge-emoji">{challenge.emoji}</span>
-                                    <div className="challenge-image-wrapper">
-                                        <img
-                                            src={challenge.image}
-                                            alt={challenge.title}
-                                            className="challenge-image"
-                                            onError={(e) => {
-                                                e.target.onerror = null;
-                                                e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzBhMTUxMCIvPjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNGRkQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBvZiB7e2NoYWxsZW5nZS50aXRsZX19PC90ZXh0Pjwvc3ZnPg==";
-                                            }}
-                                        />
+                        {challenges.map(function (challenge) {
+                            return (
+                                <div key={challenge.id} className="challenge-card hub-anim-reveal-up"
+                                    style={{ animationDelay: `${0.1 * challenge.id}s` }}>
+                                    <div className="challenge-image-container">
+                                        <span className="challenge-emoji">{challenge.emoji}</span>
+                                        <div className="challenge-image-wrapper">
+                                            <img
+                                                src={challenge.image}
+                                                alt={challenge.title}
+                                                className="challenge-image"
+                                                onError={function (e) {
+                                                    e.target.onerror = null;
+                                                    e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iIzBhMTUxMCIvPjx0ZXh0IHg9IjIwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiNGRkQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBvZiB7e2NoYWxsZW5nZS50aXRsZX19PC90ZXh0Pjwvc3ZnPg==";
+                                                }}
+                                            />
 
-                                        <div className="author-avatars">
-                                            {challenge.authorAvatars.map((avatar, _index) => (
-                                                <div key={_index} className="author-avatar-wrapper">
-                                                    <img
-                                                        src={avatar}
-                                                        alt={challenge.authorNames[_index]}
-                                                        className="author-avatar"
-                                                        onError={(e) => {
-                                                            e.target.onerror = null;
-                                                            e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRkQ3MDAiLz48dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzBhMTUxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+e3tjaGFyQXQwfX08L3RleHQ+PC9zdmc+".replace('{{charAt0}}', challenge.authorNames[_index]?.charAt(0) || '?');
-                                                        }}
-                                                    />
-                                                    {challenge.authorAvatars.length > 1 && _index === 0 && (
-                                                        <div className="avatar-count">+{challenge.authorAvatars.length - 1}</div>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="challenge-content">
-                                    <h3>{challenge.title}</h3>
-                                    <p className="challenge-description">{challenge.description}</p>
-
-                                    <div className="challenge-meta">
-                                        <div className="challenge-authors">
-                                            <span className="meta-label">{community.authorLabel}</span>
-                                            {challenge.authorNames.map((name, _index) => (
-                                                <span key={_index} className="author-name">{name}</span>
-                                            ))}
-                                        </div>
-
-                                        <div className="challenge-tags">
-                                            {challenge.hashtags.map((tag, _index) => (
-                                                <span key={_index} className="hashtag">#{tag.replace('#', '')}</span>
-                                            ))}
+                                            <div className="author-avatars">
+                                                {challenge.authorAvatars.map(function (avatar, index) {
+                                                    return (
+                                                        <div key={index} className="author-avatar-wrapper">
+                                                            <img
+                                                                src={avatar}
+                                                                alt={challenge.authorNames[index]}
+                                                                className="author-avatar"
+                                                                onError={function (e) {
+                                                                    e.target.onerror = null;
+                                                                    e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRkQ3MDAiLz48dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzBhMTUxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+e3tjaGFyQXQwfX08L3RleHQ+PC9zdmc+".replace('{{charAt0}}', challenge.authorNames[index]?.charAt(0) || '?');
+                                                                }}
+                                                            />
+                                                            {challenge.authorAvatars.length > 1 && index === 0 && (
+                                                                <div className="avatar-count">+{challenge.authorAvatars.length - 1}</div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <a
-                                        href={challenge.tweetLink}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="challenge-button"
-                                    >
-                                        <span>{community.participate}</span>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                            <path d="M23 1L1 23M23 1H9M23 1V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </a>
+                                    <div className="challenge-content">
+                                        <h3>{challenge.title}</h3>
+                                        <p className="challenge-description">{challenge.description}</p>
+
+                                        <div className="challenge-meta">
+                                            <div className="challenge-authors">
+                                                <span className="meta-label">{community.authorLabel}</span>
+                                                {challenge.authorNames.map(function (name, index) {
+                                                    return (
+                                                        <span key={index} className="author-name">{name}</span>
+                                                    );
+                                                })}
+                                            </div>
+
+                                            <div className="challenge-tags">
+                                                {challenge.hashtags.map(function (tag, index) {
+                                                    return (
+                                                        <span key={index} className="hashtag">#{tag.replace('#', '')}</span>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+
+                                        <a
+                                            href={challenge.tweetLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="challenge-button"
+                                        >
+                                            <span>{community.participate}</span>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                                <path d="M23 1L1 23M23 1H9M23 1V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                            </svg>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -1650,9 +1775,16 @@ const CommunityPage = ({ t }) => {
                     </div>
 
                     <div className="events-grid-two-columns">
-                        {displayEvents.map((event) => (
-                            <EventCard key={event.id} event={event} community={community} t={t} />
-                        ))}
+                        {displayEvents.map(function (event) {
+                            return (
+                                <EventCard
+                                    key={event.id}
+                                    event={event}
+                                    community={community}
+                                    t={t}
+                                />
+                            );
+                        })}
                     </div>
 
                     {upcomingEvents.length > 0 && (
@@ -1666,10 +1798,10 @@ const CommunityPage = ({ t }) => {
             )}
         </div>
     );
-};
+}
 
-const EventCard = ({ event, community, t }) => {
-    const _isRussian = t.communityPage.title === "Сообщество";
+function EventCard({ event, community, t }) {
+    const isRussian = t.communityPage.title === "Сообщество";
 
     return (
         <div className="event-card hub-anim-reveal-up">
@@ -1679,7 +1811,7 @@ const EventCard = ({ event, community, t }) => {
                         src={event.authorAvatar}
                         alt={event.author}
                         className="event-author-avatar"
-                        onError={(e) => {
+                        onError={function (e) {
                             e.target.onerror = null;
                             e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNGRkQ3MDAiLz48dGV4dCB4PSIyMCIgeT0iMjUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzBhMTUxMCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+UzwvdGV4dD48L3N2Zz4=";
                         }}
@@ -1708,7 +1840,7 @@ const EventCard = ({ event, community, t }) => {
                     src={event.image}
                     alt={event.title}
                     className="event-main-image"
-                    onError={(e) => {
+                    onError={function (e) {
                         e.target.onerror = null;
                         e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iIzBhMTUxMCIvPjx0ZXh0IHg9IjMwMCIgeT0iMTUwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNGRkQ3MDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5FdmVudDwvdGV4dD48L3N2Zz4=";
                     }}
@@ -1785,12 +1917,20 @@ const EventCard = ({ event, community, t }) => {
             </div>
         </div>
     );
-};
+}
 
-const NewsPage = ({ t }) => {
+function NewsPage({ t }) {
     const newsT = t.newsPage;
     const [expandedNews, setExpandedNews] = useState(null);
     const [activeCategory, setActiveCategory] = useState('all');
+
+    const toggleNews = function (id) {
+        if (expandedNews === id) {
+            setExpandedNews(null);
+        } else {
+            setExpandedNews(id);
+        }
+    };
 
     const news = t.newsPage.title === "Новости & Анонсы" ? [
         {
@@ -1801,30 +1941,7 @@ const NewsPage = ({ t }) => {
             image: "/news/presale.jpg",
             status: "upcoming",
             shortDescription: "Анонс пресейла токена $BLOCK, который децентрализует сеть Ephemeral Rollups и открывает новую эру onchain-приложений.",
-            fullContent: `Solana доказала, что высокая пропускная способность и низкие комиссии открывают широкий класс приложений в блокчейне.
-
-Мы верим, что история Web3 только начинается. Мы верим в будущее, где любое приложение может быть полностью построено на блокчейне и стать проверяемым, совместимым и неостанавливаемым. Но для разблокировки еще большего класса приложений, таких как высокочастотный трейдинг, игры с монетизацией и приватные приложения, требуется сверхнизкая задержка и незначительные вычислительные затраты.
-
-Это наша конечная цель: замена AWS и облачных провайдеров.
-
-MagicBlock конкурирует с традиционными серверами, предоставляя разработчикам Solana децентрализованную альтернативу для вычислений в реальном времени. Вместо запуска логики приложений через централизованные серверы разработчики могут полагаться на сеть Ephemeral Rollups (ER), которая обеспечивает низкую задержку (<50 мс), приватное состояние и настройку среды выполнения по требованию, оставаясь при этом совместимой с ликвидностью Solana и общим состоянием.
-
-Несколько месяцев назад мы запустили MagicNet и начали проверять нашу концепцию в реальном мире. С тех пор сеть обработала 1 миллиард транзакций с 250 тысячами делегирований на 27 тысяч уникальных адресов.
-
-MagicNet включает разнообразные приложения реального времени: tap-to-trade (Rush, Banana Zone, Bloxwap), игры с монетизацией (Supersize, DOLERO, Battle Chaos), стриминговые платформы (Vorld), приватные примитивы (Loyal, Cloak) и DePIN (dTelecom).
-
-Что такое $BLOCK?
-$BLOCK — это сетевой токен. Он координирует и стимулирует набор операторов узлов ER, которые предоставляют вычисления в реальном времени для приложений Solana. Операторы узлов стейкуют $BLOCK для участия, и этот стейк делает их подотчетными за свое поведение, укрепляя безопасность и надежность сети.
-
-Как участвовать
-Есть два варианта участия в пресейле:
-Вариант 1: FCFS Bonding Curve (полностью разблокируется на TGE)
-Вариант 1 — это кривая связывания по принципу "кто первый пришел". Ваше распределение определяется спросом и временем заявки. Этот вариант предназначен для тех, кто хочет простой механизм и токены, полностью разблокированные на TGE.
-
-Вариант 2: Request for Allocation (фиксированная цена 100M FDV, блокировка на 1 год)
-Вариант 2 — это запрос на распределение. Вы подаете сумму, которую хотите зарезервировать по фиксированной цене 100M FDV. Нет гарантии, что ваша заявка будет принята. Финальные распределения определяются после пресейла в течение недели.
-
-Прессейл начинается 5 февраля 2026 года.`,
+            fullContent: `Solana доказала, что высокая пропускная способность и низкие комиссии открывают широкий класс приложений в блокчейне.\n\nМы верим, что история Web3 только начинается. Мы верим в будущее, где любое приложение может быть полностью построено на блокчейне и стать проверяемым, совместимым и неостанавливаемым. Но для разблокировки еще большего класса приложений, таких как высокочастотный трейдинг, игры с монетизацией и приватные приложения, требуется сверхнизкая задержка и незначительные вычислительные затраты.\n\nЭто наша конечная цель: замена AWS и облачных провайдеров.\n\nMagicBlock конкурирует с традиционными серверами, предоставляя разработчикам Solana децентрализованную альтернативу для вычислений в реальном времени. Вместо запуска логики приложений через централизованные серверы разработчики могут полагаться на сеть Ephemeral Rollups (ER), которая обеспечивает низкую задержку (<50 мс), приватное состояние и настройку среды выполнения по требованию, оставаясь при этом совместимой с ликвидностью Solana и общим состоянием.\n\nНесколько месяцев назад мы запустили MagicNet и начали проверять нашу концепцию в реальном мире. С тех пор сеть обработала 1 миллиард транзакций с 250 тысячами делегирований на 27 тысяч уникальных адресов.\n\nMagicNet включает разнообразные приложения реального времени: tap-to-trade (Rush, Banana Zone, Bloxwap), игры с монетизацией (Supersize, DOLERO, Battle Chaos), стриминговые платформы (Vorld), приватные примитивы (Loyal, Cloak) и DePIN (dTelecom).\n\nЧто такое $BLOCK?\n$BLOCK — это сетевой токен. Он координирует и стимулирует набор операторов узлов ER, которые предоставляют вычисления в реальном времени для приложений Solana. Операторы узлов стейкуют $BLOCK для участия, и этот стейк делает их подотчетными за свое поведение, укрепляя безопасность и надежность сети.\n\nКак участвовать\nЕсть два варианта участия в пресейле:\nВариант 1: FCFS Bonding Curve (полностью разблокируется на TGE)\nВариант 1 — это кривая связывания по принципу "кто первый пришел". Ваше распределение определяется спросом и временем заявки. Этот вариант предназначен для тех, кто хочет простой механизм и токены, полностью разблокированные на TGE.\n\nВариант 2: Request for Allocation (фиксированная цена 100M FDV, блокировка на 1 год)\nВариант 2 — это запрос на распределение. Вы подаете сумму, которую хотите зарезервировать по фиксированной цене 100M FDV. Нет гарантии, что ваша заявка будет принята. Финальные распределения определяются после пресейла в течение недели.\n\nПрессейл начинается 5 февраля 2026 года.`,
             links: [
                 { text: "Сайт пресейла", url: "https://presale.magicblock.app" },
                 { text: "Документация", url: "https://docs.magicblock.app" }
@@ -1843,26 +1960,7 @@ $BLOCK — это сетевой токен. Он координирует и с
             image: "/news/hackathon.jpg",
             status: "active",
             shortDescription: "Регистрация на Matrix Hackathon открыта. Хакатон проводится с 1 января по 20 февраля с призовым фондом и несколькими треками.",
-            fullContent: `Регистрация на Matrix Hackathon официально открыта!
-
-Треки хакатона включают:
-
-🎮 PSG1-first от Play Solana
-🎯 Геймификация, DeFi & Mobile Adventures от @jup_mobile
-🔐 Шифрованные игры от @Arcium
-🏗️ On-chain активы и программируемая игровая инфраструктура от @metaplex
-⚡ Solana On-Chain & Real-Time Gaming от @magicblock
-
-Полные условия и детали призов для каждого трека можно найти на сайте или в нашем Discord-сервере.
-
-• Команды или отдельные разработчики могут присоединиться к серверу и искать членов команды
-• Хакатон полностью онлайн и глобальный, проходит с 1 января по 20 февраля
-
-Призы и возможности:
-- Главный приз: $50,000 в SOL
-- Финансирование для лучших проектов
-- Интеграция в экосистему MagicBlock
-- Наставничество от ведущих разработчиков Solana`,
+            fullContent: `Регистрация на Matrix Hackathon официально открыта!\n\nТреки хакатона включают:\n\n🎮 PSG1-first от Play Solana\n🎯 Геймификация, DeFi & Mobile Adventures от @jup_mobile\n🔐 Шифрованные игры от @Arcium\n🏗️ On-chain активы и программируемая игровая инфраструктура от @metaplex\n⚡ Solana On-Chain & Real-Time Gaming от @magicblock\n\nПолные условия и детали призов для каждого трека можно найти на сайте или в нашем Discord-сервере.\n\n• Команды или отдельные разработчики могут присоединиться к серверу и искать членов команды\n• Хакатон полностью онлайн и глобальный, проходит с 1 января по 20 февраля\n\nПризы и возможности:\n- Главный приз: $50,000 в SOL\n- Финансирование для лучших проектов\n- Интеграция в экосистему MagicBlock\n- Наставничество от ведущих разработчиков Solana`,
             links: [
                 { text: "Регистрация", url: "https://matrix.playsolana.com" },
                 { text: "Discord", url: "https://discord.gg/playsolanaofficial" }
@@ -1882,32 +1980,7 @@ $BLOCK — это сетевой токен. Он координирует и с
             image: "/news/compression.jpg",
             status: "live",
             shortDescription: "MagicBlock партнерит с Light Protocol для интеграции ZK-компрессии аккаунтов, уменьшая стоимость хранения данных в 200 раз.",
-            fullContent: `Мы объединились с @LightProtocol, чтобы представить новый способ взаимодействия с сжатыми аккаунтами как с обычными аккаунтами Solana.
-
-Экономия от компрессии с удобством разработки Solana 🧵👇
-
-💾 Что такое сжатые аккаунты?
-Вместо того чтобы каждый PDA жил как отдельный платящий ренту аккаунт, миллионы аккаунтов сжимаются в один корневой хэш дерева Меркла. Только этот хэш хранится в блокчейн-аккаунте, экономя до 200x в стоимости аренды.
-
-⚙️ Как это используется в Ephemeral Rollups
-ER обнаруживает сжатые аккаунты по детерминированному сопоставлению адресов. Он извлекает состояние и ZK-доказательство из индексера, проверяет их и восстанавливает аккаунт Solana в памяти. С этого момента вы можете взаимодействовать с ним как с любым другим аккаунтом.
-
-🔄 Фиксация состояния
-При фиксации или отмене делегирования состояния ER восстанавливает новый корень Меркла и отправляет обновленное состояние и доказательство обратно в Solana. Любой сжатый аккаунт также может быть декомпрессирован в его канонический PDA, используя те же сиды для подписи.
-
-🔓 Бесшовный опыт разработчика
-Это означает, что внутри Ephemeral Rollup разработчики могут обращаться со сжатыми аккаунтами как с "обычными" аккаунтами:
-• Те же SDK и клиенты
-• Тот же PDA-style доступ
-• Сжатое хранилище + ZK гарантии на бэкенде
-
-🪄 Почему это меняет всё
-ZK-компрессия открывает варианты использования, которые были невозможны в блокчейне раньше:
-• Социальные сети
-• Блокчейн-идентичность для миллиардов пользователей
-• Полностью блокчейн потребительские приложения
-
-🔮 Попробуйте демо`,
+            fullContent: `Мы объединились с @LightProtocol, чтобы представить новый способ взаимодействия с сжатыми аккаунтами как с обычными аккаунтами Solana.\n\nЭкономия от компрессии с удобством разработки Solana 🧵👇\n\n💾 Что такое сжатые аккаунты?\nВместо того чтобы каждый PDA жил как отдельный платящий ренту аккаунт, миллионы аккаунтов сжимаются в один корневой хэш дерева Меркла. Только этот хэш хранится в блокчейн-аккаунте, экономя до 200x в стоимости аренды.\n\n⚙️ Как это используется в Ephemeral Rollups\nER обнаруживает сжатые аккаунты по детерминированному сопоставлению адресов. Он извлекает состояние и ZK-доказательство из индексера, проверяет их и восстанавливает аккаунт Solana в памяти. С этого момента вы можете взаимодействовать с ним как с любым другим аккаунтом.\n\n🔄 Фиксация состояния\nПри фиксации или отмене делегирования состояния ER восстанавливает новый корень Меркла и отправляет обновленное состояние и доказательство обратно в Solana. Любой сжатый аккаунт также может быть декомпрессирован в его канонический PDA, используя те же сиды для подписи.\n\n🔓 Бесшовный опыт разработчика\nЭто означает, что внутри Ephemeral Rollup разработчики могут обращаться со сжатыми аккаунтами как с "обычными" аккаунтами:\n• Те же SDK и клиенты\n• Тот же PDA-style доступ\n• Сжатое хранилище + ZK гарантии на бэкенде\n\n🪄 Почему это меняет всё\nZK-компрессия открывает варианты использования, которые были невозможны в блокчейне раньше:\n• Социальные сети\n• Блокчейн-идентичность для миллиардов пользователей\n• Полностью блокчейн потребительские приложения\n\n🔮 Попробуйте демо`,
             links: [
                 { text: "Демо", url: "http://compression.magicblock.app" },
                 { text: "Документация Light", url: "https://docs.lightprotocol.com" }
@@ -1927,28 +2000,7 @@ ZK-компрессия открывает варианты использова
             image: "/news/sponsor.jpg",
             status: "active",
             shortDescription: "MagicBlock выступает спонсором Matrix Hackathon от PlaySolana. Создавайте приложения реального времени для консоли PlaySolana.",
-            fullContent: `Мы с гордостью сообщаем о спонсорстве Matrix Hackathon от @playsolana!
-
-🎯 О хакатоне:
-Matrix Hackathon — это возможность для разработчиков создать инновационные приложения реального времени для экосистемы Solana. MagicBlock выступает ключевым спонсором и технологическим партнером этого мероприятия.
-
-🚀 Что можно построить:
-Создавайте приложения реального времени для консоли PlaySolana и получите доступ к 10,000 владельцев устройств с первого дня. Хакатон фокусируется на нескольких ключевых направлениях:
-
-• Игры реального времени на Solana
-• DeFi приложения с низкой задержкой
-• Социальные и мультимедийные платформы
-• Инфраструктурные решения для игр
-
-🎁 Преимущества для участников:
-- Призовой фонд от MagicBlock: $25,000
-- Техническая поддержка от нашей команды
-- Возможность интеграции в экосистему MagicBlock
-- Прямой доступ к нашим API и инструментам
-
-📅 Регистрация откроется через 3 дня - следите за обновлениями на официальных каналах PlaySolana!
-
-Наша миссия — поддержать следующее поколение разработчиков, создающих будущее децентрализованных приложений реального времени.`,
+            fullContent: `Мы с гордостью сообщаем о спонсорстве Matrix Hackathon от @playsolana!\n\n🎯 О хакатоне:\nMatrix Hackathon — это возможность для разработчиков создать инновационные приложения реального времени для экосистемы Solana. MagicBlock выступает ключевым спонсором и технологическим партнером этого мероприятия.\n\n🚀 Что можно построить:\nСоздавайте приложения реального времени для консоли PlaySolana и получите доступ к 10,000 владельцев устройств с первого дня. Хакатон фокусируется на нескольких ключевых направлениях:\n\n• Игры реального времени на Solana\n• DeFi приложения с низкой задержкой\n• Социальные и мультимедийные платформы\n• Инфраструктурные решения для игр\n\n🎁 Преимущества для участников:\n- Призовой фонд от MagicBlock: $25,000\n- Техническая поддержка от нашей команды\n- Возможность интеграции в экосистему MagicBlock\n- Прямой доступ к нашим API и инструментам\n\n📅 Регистрация откроется через 3 дня - следите за обновлениями на официальных каналах PlaySolana!\n\nНаша миссия — поддержать следующее поколение разработчиков, создающих будущее децентрализованных приложений реального времени.`,
             links: [
                 { text: "Сайт хакатона", url: "https://matrix.playsolana.com" },
                 { text: "Twitter PlaySolana", url: "https://x.com/playsolana" },
@@ -1970,30 +2022,7 @@ Matrix Hackathon — это возможность для разработчик
             image: "/news/presale.jpg",
             status: "upcoming",
             shortDescription: "Announcement of the $BLOCK token presale, which decentralizes the Ephemeral Rollups network and opens a new era of onchain applications.",
-            fullContent: `Solana has proven that high throughput and low fees unlock a broad class of applications on the blockchain.
-
-We believe the Web3 story is just beginning. We envision a future where any application can be fully built on-chain and become verifiable, composable, and unstoppable. But to unlock an even larger class of applications, such as high-frequency trading, monetized games, and private apps, ultra-low latency and negligible computation costs are required.
-
-This is our ultimate goal: replacing AWS and cloud providers.
-
-MagicBlock competes with traditional servers by providing Solana developers with a decentralized alternative for real-time computations. Instead of running app logic through centralized servers, developers can rely on the Ephemeral Rollups (ER) network, which delivers low latency (<50 ms), private state, and on-demand runtime customization while remaining compatible with Solana's liquidity and shared state.
-
-A few months ago, we launched MagicNet and began validating our concept in the real world. Since then, the network has processed 1 billion transactions with 250 thousand delegations across 27 thousand unique addresses.
-
-MagicNet includes diverse real-time applications: tap-to-trade (Rush, Banana Zone, Bloxwap), monetized games (Supersize, DOLERO, Battle Chaos), streaming platforms (Vorld), private primitives (Loyal, Cloak), and DePIN (dTelecom).
-
-What is $BLOCK?
-$BLOCK is the network token. It coordinates and incentivizes a set of ER node operators who provide real-time computations for Solana applications. Node operators stake $BLOCK to participate, and this stake holds them accountable for their behavior, strengthening the network's security and reliability.
-
-How to Participate
-There are two options for participating in the presale:
-Option 1: FCFS Bonding Curve (fully unlocked at TGE)
-Option 1 is a first-come-first-served bonding curve. Your allocation is determined by demand and application timing. This option is designed for those who want a simple mechanism and tokens fully unlocked at TGE.
-
-Option 2: Request for Allocation (fixed price 100M FDV, 1-year lockup)
-Option 2 is a request for allocation. You submit the amount you wish to reserve at a fixed price of 100M FDV. There is no guarantee your application will be accepted. Final allocations are determined after the presale within a week.
-
-The presale starts on February 5, 2026.`,
+            fullContent: `Solana has proven that high throughput and low fees unlock a broad class of applications on the blockchain.\n\nWe believe the Web3 story is just beginning. We envision a future where any application can be fully built on-chain and become verifiable, composable, and unstoppable. But to unlock an even larger class of applications, such as high-frequency trading, monetized games, and private apps, ultra-low latency and negligible computation costs are required.\n\nThis is our ultimate goal: replacing AWS and cloud providers.\n\nMagicBlock competes with traditional servers by providing Solana developers with a decentralized alternative for real-time computations. Instead of running app logic through centralized servers, developers can rely on the Ephemeral Rollups (ER) network, which delivers low latency (<50 ms), private state, and on-demand runtime customization while remaining compatible with Solana's liquidity and shared state.\n\nA few months ago, we launched MagicNet and began validating our concept in the real world. Since then, the network has processed 1 billion transactions with 250 thousand delegations across 27 thousand unique addresses.\n\nMagicNet includes diverse real-time applications: tap-to-trade (Rush, Banana Zone, Bloxwap), monetized games (Supersize, DOLERO, Battle Chaos), streaming platforms (Vorld), private primitives (Loyal, Cloak), and DePIN (dTelecom).\n\nWhat is $BLOCK?\n$BLOCK is the network token. It coordinates and incentivizes a set of ER node operators who provide real-time computations for Solana applications. Node operators stake $BLOCK to participate, and this stake holds them accountable for their behavior, strengthening the network's security and reliability.\n\nHow to Participate\nThere are two options for participating in the presale:\nOption 1: FCFS Bonding Curve (fully unlocked at TGE)\nOption 1 is a first-come-first-served bonding curve. Your allocation is determined by demand and application timing. This option is designed for those who want a simple mechanism and tokens fully unlocked at TGE.\n\nOption 2: Request for Allocation (fixed price 100M FDV, 1-year lockup)\nOption 2 is a request for allocation. You submit the amount you wish to reserve at a fixed price of 100M FDV. There is no guarantee your application will be accepted. Final allocations are determined after the presale within a week.\n\nThe presale starts on February 5, 2026.`,
             links: [
                 { text: "Presale Site", url: "https://presale.magicblock.app" },
                 { text: "Documentation", url: "https://docs.magicblock.app" }
@@ -2012,26 +2041,7 @@ The presale starts on February 5, 2026.`,
             image: "/news/hackathon.jpg",
             status: "active",
             shortDescription: "Registration for Matrix Hackathon is open. The hackathon runs from January 1 to February 20 with prize pools and multiple tracks.",
-            fullContent: `Registration for Matrix Hackathon is officially open!
-
-Hackathon tracks include:
-
-🎮 PSG1-first from Play Solana
-🎯 Gamification, DeFi & Mobile Adventures from @jup_mobile
-🔐 Encrypted Games from @Arcium
-🏗️ On-chain Assets and Programmable Gaming Infrastructure from @metaplex
-⚡ Solana On-Chain & Real-Time Gaming from @magicblock
-
-Full terms and prize details for each track can be found on the website or in our Discord server.
-
-• Teams or individual developers can join the server and look for team members
-• The hackathon is fully online and global, running from January 1 to February 20
-
-Prizes and Opportunities:
-- Grand Prize: $50,000 in SOL
-- Funding for top projects
-- Integration into the MagicBlock ecosystem
-- Mentorship from leading Solana developers`,
+            fullContent: `Registration for Matrix Hackathon is officially open!\n\nHackathon tracks include:\n\n🎮 PSG1-first from Play Solana\n🎯 Gamification, DeFi & Mobile Adventures from @jup_mobile\n🔐 Encrypted Games from @Arcium\n🏗️ On-chain Assets and Programmable Gaming Infrastructure from @metaplex\n⚡ Solana On-Chain & Real-Time Gaming from @magicblock\n\nFull terms and prize details for each track can be found on the website or in our Discord server.\n\n• Teams or individual developers can join the server and look for team members\n• The hackathon is fully online and global, running from January 1 to February 20\n\nPrizes and Opportunities:\n- Grand Prize: $50,000 in SOL\n- Funding for top projects\n- Integration into the MagicBlock ecosystem\n- Mentorship from leading Solana developers`,
             links: [
                 { text: "Registration", url: "https://matrix.playsolana.com" },
                 { text: "Discord", url: "https://discord.gg/playsolanaofficial" }
@@ -2051,32 +2061,7 @@ Prizes and Opportunities:
             image: "/news/compression.jpg",
             status: "live",
             shortDescription: "MagicBlock partners with Light Protocol to integrate ZK-compression of accounts, reducing data storage costs by 200x.",
-            fullContent: `We've teamed up with @LightProtocol to introduce a new way to interact with compressed accounts as regular Solana accounts.
-
-Compression savings with Solana development convenience 🧵👇
-
-💾 What are compressed accounts?
-Instead of each PDA living as a separate rent-paying account, millions of accounts are compressed into a single Merkle tree root hash. Only this hash is stored in the blockchain account, saving up to 200x in rent costs.
-
-⚙️ How it's used in Ephemeral Rollups
-ER detects compressed accounts via deterministic address mapping. It fetches the state and ZK-proof from the indexer, verifies them, and restores the Solana account in memory. From then on, you can interact with it like any other account.
-
-🔄 State Commitment
-Upon committing or revoking state delegation, ER restores the new Merkle root and sends the updated state and proof back to Solana. Any compressed account can also be decompressed into its canonical PDA using the same seeds for signing.
-
-🔓 Seamless Developer Experience
-This means that inside an Ephemeral Rollup, developers can treat compressed accounts as "regular" accounts:
-• Same SDKs and clients
-• Same PDA-style access
-• Compressed storage + ZK guarantees in the backend
-
-🪄 Why this changes everything
-ZK-compression unlocks use cases that were impossible on-chain before:
-• Social networks
-• Blockchain identity for billions of users
-• Fully on-chain consumer apps
-
-🔮 Try the demo`,
+            fullContent: `We've teamed up with @LightProtocol to introduce a new way to interact with compressed accounts as regular Solana accounts.\n\nCompression savings with Solana development convenience 🧵👇\n\n💾 What are compressed accounts?\nInstead of each PDA living as a separate rent-paying account, millions of accounts are compressed into a single Merkle tree root hash. Only this hash is stored in the blockchain account, saving up to 200x in rent costs.\n\n⚙️ How it's used in Ephemeral Rollups\nER detects compressed accounts via deterministic address mapping. It fetches the state and ZK-proof from the indexer, verifies them, and restores the Solana account in memory. From then on, you can interact with it like any other account.\n\n🔄 State Commitment\nUpon committing or revoking state delegation, ER restores the new Merkle root and sends the updated state and proof back to Solana. Any compressed account can also be decompressed into its canonical PDA using the same seeds for signing.\n\n🔓 Seamless Developer Experience\nThis means that inside an Ephemeral Rollup, developers can treat compressed accounts as "regular" accounts:\n• Same SDKs and clients\n• Same PDA-style access\n• Compressed storage + ZK guarantees in the backend\n\n🪄 Why this changes everything\nZK-compression unlocks use cases that were impossible on-chain before:\n• Social networks\n• Blockchain identity for billions of users\n• Fully on-chain consumer apps\n\n🔮 Try the demo`,
             links: [
                 { text: "Demo", url: "http://compression.magicblock.app" },
                 { text: "Light Documentation", url: "https://docs.lightprotocol.com" }
@@ -2096,28 +2081,7 @@ ZK-compression unlocks use cases that were impossible on-chain before:
             image: "/news/sponsor.jpg",
             status: "active",
             shortDescription: "MagicBlock sponsors Matrix Hackathon from PlaySolana. Build real-time applications for the PlaySolana console.",
-            fullContent: `We are proud to announce our sponsorship of Matrix Hackathon from @playsolana!
-
-🎯 About the Hackathon:
-Matrix Hackathon is an opportunity for developers to create innovative real-time applications for the Solana ecosystem. MagicBlock serves as a key sponsor and technology partner for this event.
-
-🚀 What You Can Build:
-Create real-time applications for the PlaySolana console and gain access to 10,000 device owners from day one. The hackathon focuses on several key areas:
-
-• Real-time games on Solana
-• Low-latency DeFi applications
-• Social and multimedia platforms
-• Infrastructure solutions for games
-
-🎁 Benefits for Participants:
-- Prize pool from MagicBlock: $25,000
-- Technical support from our team
-- Opportunity for integration into the MagicBlock ecosystem
-- Direct access to our APIs and tools
-
-📅 Registration opens in 3 days - stay tuned for updates on PlaySolana's official channels!
-
-Our mission is to support the next generation of developers building the future of decentralized real-time applications.`,
+            fullContent: `We are proud to announce our sponsorship of Matrix Hackathon from @playsolana!\n\n🎯 About the Hackathon:\nMatrix Hackathon is an opportunity for developers to create innovative real-time applications for the Solana ecosystem. MagicBlock serves as a key sponsor and technology partner for this event.\n\n🚀 What You Can Build:\nCreate real-time applications for the PlaySolana console and gain access to 10,000 device owners from day one. The hackathon focuses on several key areas:\n\n• Real-time games on Solana\n• Low-latency DeFi applications\n• Social and multimedia platforms\n• Infrastructure solutions for games\n\n🎁 Benefits for Participants:\n- Prize pool from MagicBlock: $25,000\n- Technical support from our team\n- Opportunity for integration into the MagicBlock ecosystem\n- Direct access to our APIs and tools\n\n📅 Registration opens in 3 days - stay tuned for updates on PlaySolana's official channels!\n\nOur mission is to support the next generation of developers building the future of decentralized real-time applications.`,
             links: [
                 { text: "Hackathon Site", url: "https://matrix.playsolana.com" },
                 { text: "PlaySolana Twitter", url: "https://x.com/playsolana" },
@@ -2132,13 +2096,11 @@ Our mission is to support the next generation of developers building the future 
         }
     ];
 
-    const toggleNews = (id) => {
-        setExpandedNews(expandedNews === id ? null : id);
-    };
-
     const filteredNews = activeCategory === 'all'
         ? news
-        : news.filter(item => item.category === activeCategory);
+        : news.filter(function (item) {
+            return item.category === activeCategory;
+        });
 
     return (
         <div className="page hub-anim-fade-in">
@@ -2152,163 +2114,177 @@ Our mission is to support the next generation of developers building the future 
             <div className="news-categories hub-anim-reveal-up" style={{ animationDelay: '0.1s' }}>
                 <button
                     className={`category-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                    onClick={() => setActiveCategory('all')}
+                    onClick={function () { setActiveCategory('all'); }}
                 >
                     {newsT.allNews} ({news.length})
                 </button>
                 <button
                     className={`category-btn ${activeCategory === 'token' ? 'active' : ''}`}
-                    onClick={() => setActiveCategory('token')}
+                    onClick={function () { setActiveCategory('token'); }}
                 >
                     {newsT.token}
                 </button>
                 <button
                     className={`category-btn ${activeCategory === 'event' ? 'active' : ''}`}
-                    onClick={() => setActiveCategory('event')}
+                    onClick={function () { setActiveCategory('event'); }}
                 >
                     {newsT.event}
                 </button>
                 <button
                     className={`category-btn ${activeCategory === 'tech' ? 'active' : ''}`}
-                    onClick={() => setActiveCategory('tech')}
+                    onClick={function () { setActiveCategory('tech'); }}
                 >
                     {newsT.tech}
                 </button>
                 <button
                     className={`category-btn ${activeCategory === 'sponsor' ? 'active' : ''}`}
-                    onClick={() => setActiveCategory('sponsor')}
+                    onClick={function () { setActiveCategory('sponsor'); }}
                 >
                     {newsT.sponsor}
                 </button>
             </div>
 
             <div className="news-grid">
-                {filteredNews.map((item, index) => (
-                    <div
-                        key={item.id}
-                        className={`news-card hub-anim-reveal-up ${expandedNews === item.id ? 'expanded' : ''}`}
-                        style={{ animationDelay: `${0.1 + index * 0.1}s` }}
-                    >
-                        <div className={`news-badge ${item.status}`}>
-                            {item.status === 'upcoming' ? newsT.statusUpcoming :
-                                item.status === 'active' ? newsT.statusActive : newsT.statusLive}
-                        </div>
-
-                        <div className="news-image-container">
-                            <img
-                                src={item.image}
-                                alt={item.title}
-                                className="news-image"
-                                onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = `data:image/svg+xml;base64,${btoa(`
-                    <svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="400" height="250" fill="#0a1510"/>
-                      <rect x="20" y="20" width="360" height="180" rx="10" fill="#1a2a1a" stroke="#FFD700" stroke-width="2"/>
-                      <text x="200" y="110" font-family="Arial" font-size="20" fill="#FFD700" text-anchor="middle">
-                        ${item.category === 'token' ? '🚀 Token' :
-                                            item.category === 'event' ? '🎯 Event' :
-                                                item.category === 'tech' ? '⚙️ Technology' : '🤝 Sponsorship'}
-                      </text>
-                      <text x="200" y="140" font-family="Arial" font-size="16" fill="#B8D972" text-anchor="middle">
-                        MagicBlock
-                      </text>
-                    </svg>
-                  `)}`
-                                }}
-                            />
-                            <div className="news-date-overlay">
-                                <span className="date-icon">📅</span>
-                                <span className="news-date-text">{item.date}</span>
-                            </div>
-                        </div>
-
-                        <div className="news-content">
-                            <div className="news-category-tag">
-                                {item.category === 'token' && newsT.token}
-                                {item.category === 'event' && newsT.event}
-                                {item.category === 'tech' && newsT.tech}
-                                {item.category === 'sponsor' && newsT.sponsor}
+                {filteredNews.map(function (item, index) {
+                    return (
+                        <div
+                            key={item.id}
+                            className={`news-card hub-anim-reveal-up ${expandedNews === item.id ? 'expanded' : ''}`}
+                            style={{ animationDelay: `${0.1 + index * 0.1}s` }}
+                        >
+                            <div className={`news-badge ${item.status}`}>
+                                {item.status === 'upcoming' ? newsT.statusUpcoming :
+                                    item.status === 'active' ? newsT.statusActive : newsT.statusLive}
                             </div>
 
-                            <h3 className="news-title">{item.title}</h3>
-                            <p className="news-short">{item.shortDescription}</p>
-
-                            {item.stats && (
-                                <div className="news-stats">
-                                    {item.stats.map((stat, idx) => (
-                                        <div key={idx} className="stat-item">
-                                            <span className="stat-value">{stat.value}</span>
-                                            <span className="stat-label">{stat.label}</span>
-                                        </div>
-                                    ))}
+                            <div className="news-image-container">
+                                <img
+                                    src={item.image}
+                                    alt={item.title}
+                                    className="news-image"
+                                    onError={function (e) {
+                                        e.target.onerror = null;
+                                        e.target.src = `data:image/svg+xml;base64,${btoa(`
+                                        <svg width="400" height="250" xmlns="http://www.w3.org/2000/svg">
+                                            <rect width="400" height="250" fill="#0a1510"/>
+                                            <rect x="20" y="20" width="360" height="180" rx="10" fill="#1a2a1a" stroke="#FFD700" stroke-width="2"/>
+                                            <text x="200" y="110" font-family="Arial" font-size="20" fill="#FFD700" text-anchor="middle">
+                                                ${item.category === 'token' ? '🚀 Token' :
+                                                item.category === 'event' ? '🎯 Event' :
+                                                    item.category === 'tech' ? '⚙️ Technology' : '🤝 Sponsorship'}
+                                            </text>
+                                            <text x="200" y="140" font-family="Arial" font-size="16" fill="#B8D972" text-anchor="middle">
+                                                MagicBlock
+                                            </text>
+                                        </svg>
+                                    `)}`
+                                    }}
+                                />
+                                <div className="news-date-overlay">
+                                    <span className="date-icon">📅</span>
+                                    <span className="news-date-text">{item.date}</span>
                                 </div>
-                            )}
+                            </div>
 
-                            {item.highlights && (
-                                <div className="news-highlights">
-                                    {item.highlights.map((highlight, idx) => (
-                                        <span key={idx} className="highlight-item">✓ {highlight}</span>
-                                    ))}
+                            <div className="news-content">
+                                <div className="news-category-tag">
+                                    {item.category === 'token' && newsT.token}
+                                    {item.category === 'event' && newsT.event}
+                                    {item.category === 'tech' && newsT.tech}
+                                    {item.category === 'sponsor' && newsT.sponsor}
                                 </div>
-                            )}
 
-                            {item.features && (
-                                <div className="news-features">
-                                    {item.features.map((feature, idx) => (
-                                        <span key={idx} className="feature-item">⚡ {feature}</span>
-                                    ))}
-                                </div>
-                            )}
+                                <h3 className="news-title">{item.title}</h3>
+                                <p className="news-short">{item.shortDescription}</p>
 
-                            {expandedNews === item.id && (
-                                <div className="news-full-content">
-                                    <div className="content-divider"></div>
-                                    <div className="full-text">
-                                        {item.fullContent.split('\n').map((paragraph, idx) => (
-                                            paragraph.trim() ? <p key={idx}>{paragraph}</p> : <br key={idx} />
-                                        ))}
+                                {item.stats && (
+                                    <div className="news-stats">
+                                        {item.stats.map(function (stat, idx) {
+                                            return (
+                                                <div key={idx} className="stat-item">
+                                                    <span className="stat-value">{stat.value}</span>
+                                                    <span className="stat-label">{stat.label}</span>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
+                                )}
 
-                                    {item.links && item.links.length > 0 && (
-                                        <div className="news-links">
-                                            <h4>{newsT.usefulLinks}</h4>
-                                            <div className="links-grid">
-                                                {item.links.map((link, idx) => (
-                                                    <a
-                                                        key={idx}
-                                                        href={link.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="news-link-btn"
-                                                    >
-                                                        {link.text}
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"
-                                                                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                                        </svg>
-                                                    </a>
-                                                ))}
-                                            </div>
+                                {item.highlights && (
+                                    <div className="news-highlights">
+                                        {item.highlights.map(function (highlight, idx) {
+                                            return (
+                                                <span key={idx} className="highlight-item">✓ {highlight}</span>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {item.features && (
+                                    <div className="news-features">
+                                        {item.features.map(function (feature, idx) {
+                                            return (
+                                                <span key={idx} className="feature-item">⚡ {feature}</span>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {expandedNews === item.id && (
+                                    <div className="news-full-content">
+                                        <div className="content-divider"></div>
+                                        <div className="full-text">
+                                            {item.fullContent.split('\n').map(function (paragraph, idx) {
+                                                if (paragraph.trim()) {
+                                                    return <p key={idx}>{paragraph}</p>;
+                                                } else {
+                                                    return <br key={idx} />;
+                                                }
+                                            })}
                                         </div>
-                                    )}
-                                </div>
-                            )}
 
-                            <div className="news-actions">
-                                <button
-                                    className={`expand-btn ${expandedNews === item.id ? 'expanded' : ''}`}
-                                    onClick={() => toggleNews(item.id)}
-                                >
-                                    {expandedNews === item.id ? newsT.collapse : newsT.readMore}
-                                    <span className="btn-icon">
-                                        {expandedNews === item.id ? '↑' : '↓'}
-                                    </span>
-                                </button>
+                                        {item.links && item.links.length > 0 && (
+                                            <div className="news-links">
+                                                <h4>{newsT.usefulLinks}</h4>
+                                                <div className="links-grid">
+                                                    {item.links.map(function (link, idx) {
+                                                        return (
+                                                            <a
+                                                                key={idx}
+                                                                href={link.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="news-link-btn"
+                                                            >
+                                                                {link.text}
+                                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"
+                                                                        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                                                </svg>
+                                                            </a>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                <div className="news-actions">
+                                    <button
+                                        className={`expand-btn ${expandedNews === item.id ? 'expanded' : ''}`}
+                                        onClick={function () { toggleNews(item.id); }}
+                                    >
+                                        {expandedNews === item.id ? newsT.collapse : newsT.readMore}
+                                        <span className="btn-icon">
+                                            {expandedNews === item.id ? '↑' : '↓'}
+                                        </span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             <div className="news-subscribe hub-anim-reveal-up" style={{ animationDelay: '0.4s' }}>
@@ -2332,9 +2308,9 @@ Our mission is to support the next generation of developers building the future 
             </div>
         </div>
     );
-};
+}
 
-const AboutPage = ({ t }) => {
+function AboutPage({ t }) {
     const about = t.aboutPage;
 
     return (
@@ -2420,9 +2396,9 @@ const AboutPage = ({ t }) => {
             </div>
         </div>
     );
-};
+}
 
-const MediaPage = ({ t }) => {
+function MediaPage({ t }) {
     const media = t.mediaPage;
     const [activeTab, setActiveTab] = useState('all');
 
@@ -2551,13 +2527,79 @@ const MediaPage = ({ t }) => {
         }
     ];
 
-    const allItems = mediaSections.flatMap(section =>
-        section.items.map(item => ({ ...item, section: section.id }))
-    );
+    const allItems = mediaSections.flatMap(function (section) {
+        return section.items.map(function (item) {
+            return {
+                ...item,
+                section: section.id
+            };
+        });
+    });
 
     const filteredItems = activeTab === 'all'
         ? allItems
-        : allItems.filter(item => item.section === activeTab);
+        : allItems.filter(function (item) {
+            return item.section === activeTab;
+        });
+
+    function getTypeIcon(type) {
+        switch (type) {
+            case 'docs': return '📚';
+            case 'video': return '🎥';
+            case 'tool': return '🛠️';
+            case 'community': return '🌐';
+            default: return '📄';
+        }
+    }
+
+    function MediaCard({ item, detailed }) {
+        return (
+            <a
+                href={item.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`media-card ${item.url === '#' ? 'disabled' : ''} ${detailed ? 'detailed' : ''}`}
+                onClick={function (e) {
+                    if (item.url === '#') {
+                        e.preventDefault();
+                    }
+                }}
+            >
+                <div className="media-card-header">
+                    <span className="media-type-icon">{getTypeIcon(item.type)}</span>
+                    {item.duration && item.duration !== '--:--' && (
+                        <span className="media-duration">{item.duration}</span>
+                    )}
+                </div>
+
+                <div className="media-card-content">
+                    <h3>{item.title}</h3>
+                    <p className="media-description">{item.description}</p>
+
+                    {item.tags && (
+                        <div className="media-tags">
+                            {item.tags.map(function (tag, idx) {
+                                return (
+                                    <span key={idx} className="media-tag">#{tag}</span>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                <div className="media-card-footer">
+                    <span className="media-link">
+                        {item.url === '#' ? media.soon : media.open}
+                        {item.url !== '#' && (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        )}
+                    </span>
+                </div>
+            </a>
+        );
+    }
 
     return (
         <div className="page hub-anim-fade-in">
@@ -2571,63 +2613,83 @@ const MediaPage = ({ t }) => {
             <div className="media-tabs hub-anim-reveal-up" style={{ animationDelay: '0.1s' }}>
                 <button
                     className={`media-tab ${activeTab === 'all' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('all')}
+                    onClick={function () { setActiveTab('all'); }}
                 >
                     <span className="tab-icon">🎯</span>
                     {media.allMaterials}
                 </button>
 
-                {mediaSections.map(section => (
-                    <button
-                        key={section.id}
-                        className={`media-tab ${activeTab === section.id ? 'active' : ''}`}
-                        onClick={() => setActiveTab(section.id)}
-                    >
-                        <span className="tab-icon">{section.icon}</span>
-                        {section.title}
-                    </button>
-                ))}
+                {mediaSections.map(function (section) {
+                    return (
+                        <button
+                            key={section.id}
+                            className={`media-tab ${activeTab === section.id ? 'active' : ''}`}
+                            onClick={function () { setActiveTab(section.id); }}
+                        >
+                            <span className="tab-icon">{section.icon}</span>
+                            {section.title}
+                        </button>
+                    );
+                })}
             </div>
 
             {activeTab === 'all' ? (
                 <div className="media-sections">
-                    {mediaSections.map((section, index) => (
-                        <div
-                            key={section.id}
-                            className="media-section hub-anim-reveal-up"
-                            style={{ animationDelay: `${0.2 + index * 0.1}s` }}
-                        >
-                            <div className="section-header">
-                                <div className="section-title-icon">
-                                    <span className="icon">{section.icon}</span>
-                                    <h2>{section.title}</h2>
+                    {mediaSections.map(function (section, index) {
+                        return (
+                            <div
+                                key={section.id}
+                                className="media-section hub-anim-reveal-up"
+                                style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+                            >
+                                <div className="section-header">
+                                    <div className="section-title-icon">
+                                        <span className="icon">{section.icon}</span>
+                                        <h2>{section.title}</h2>
+                                    </div>
+                                    <div className="section-count">{section.items.length}</div>
                                 </div>
-                                <div className="section-count">{section.items.length}</div>
-                            </div>
 
-                            <div className="media-grid">
-                                {section.items.map((item, itemIndex) => (
-                                    <MediaCard key={itemIndex} item={item} t={media} />
-                                ))}
+                                <div className="media-grid">
+                                    {section.items.map(function (item, itemIndex) {
+                                        return (
+                                            <MediaCard
+                                                key={itemIndex}
+                                                item={item}
+                                                detailed={false}
+                                            />
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             ) : (
                 <div className="media-category-view hub-anim-fade-in">
                     <div className="category-header">
                         <h2>
                             <span className="category-icon">
-                                {mediaSections.find(s => s.id === activeTab)?.icon}
+                                {mediaSections.find(function (s) {
+                                    return s.id === activeTab;
+                                })?.icon}
                             </span>
-                            {mediaSections.find(s => s.id === activeTab)?.title}
+                            {mediaSections.find(function (s) {
+                                return s.id === activeTab;
+                            })?.title}
                         </h2>
                     </div>
 
                     <div className="media-grid detailed">
-                        {filteredItems.map((item, index) => (
-                            <MediaCard key={index} item={item} detailed={true} t={media} />
-                        ))}
+                        {filteredItems.map(function (item, index) {
+                            return (
+                                <MediaCard
+                                    key={index}
+                                    item={item}
+                                    detailed={true}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -2694,62 +2756,9 @@ const MediaPage = ({ t }) => {
             </div>
         </div>
     );
-};
+}
 
-const MediaCard = ({ item, detailed = false, t }) => {
-    const getTypeIcon = (type) => {
-        switch (type) {
-            case 'docs': return '📚';
-            case 'video': return '🎥';
-            case 'tool': return '🛠️';
-            case 'community': return '🌐';
-            default: return '📄';
-        }
-    };
-
-    return (
-        <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`media-card ${item.url === '#' ? 'disabled' : ''} ${detailed ? 'detailed' : ''}`}
-            onClick={(e) => item.url === '#' && e.preventDefault()}
-        >
-            <div className="media-card-header">
-                <span className="media-type-icon">{getTypeIcon(item.type)}</span>
-                {item.duration && item.duration !== '--:--' && (
-                    <span className="media-duration">{item.duration}</span>
-                )}
-            </div>
-
-            <div className="media-card-content">
-                <h3>{item.title}</h3>
-                <p className="media-description">{item.description}</p>
-
-                {item.tags && (
-                    <div className="media-tags">
-                        {item.tags.map((tag, idx) => (
-                            <span key={idx} className="media-tag">#{tag}</span>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            <div className="media-card-footer">
-                <span className="media-link">
-                    {item.url === '#' ? t.soon : t.open}
-                    {item.url !== '#' && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    )}
-                </span>
-            </div>
-        </a>
-    );
-};
-
-const QuizPage = ({ t }) => {
+function QuizPage({ t }) {
     const quizT = t.quizPage;
 
     const questions = t.quizPage.title === "Квиз MagicBlock" ? [
@@ -3001,47 +3010,56 @@ const QuizPage = ({ t }) => {
     const [quizCompleted, setQuizCompleted] = useState(false);
     const [score, setScore] = useState(0);
     const [username, setUsername] = useState("");
-    const [_avatar, setAvatar] = useState(null);
+    const [avatar, setAvatar] = useState(null);
     const [avatarPreview, setAvatarPreview] = useState(null);
     const [certificateGenerated, setCertificateGenerated] = useState(false);
     const [certificateData, setCertificateData] = useState(null);
 
-    const handleAnswer = (questionId, optionIndex) => {
-        setAnswers(prev => ({
-            ...prev,
-            [questionId]: optionIndex
-        }));
+    const handleAnswer = function (questionId, optionIndex) {
+        setAnswers(function (prev) {
+            return {
+                ...prev,
+                [questionId]: optionIndex
+            };
+        });
     };
 
-    const handleNext = () => {
+    const handleNext = function () {
         if (currentQuestion < questions.length - 1) {
-            setCurrentQuestion(prev => prev + 1);
+            setCurrentQuestion(function (prev) {
+                return prev + 1;
+            });
         }
     };
 
-    const handlePrev = () => {
+    const handlePrev = function () {
         if (currentQuestion > 0) {
-            setCurrentQuestion(prev => prev - 1);
+            setCurrentQuestion(function (prev) {
+                return prev - 1;
+            });
         }
     };
 
-    const calculateScore = () => {
+    const calculateScore = function () {
         let correct = 0;
-        questions.forEach(q => {
+
+        questions.forEach(function (q) {
             if (answers[q.id] === q.correct) {
-                correct++;
+                correct = correct + 1;
             }
         });
+
         setScore(correct);
         return correct;
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = function () {
         const finalScore = calculateScore();
         setQuizCompleted(true);
 
         if (finalScore >= 8) {
             const savedCert = localStorage.getItem(`magicblock_cert_${username}`);
+
             if (savedCert) {
                 setCertificateData(JSON.parse(savedCert));
                 setCertificateGenerated(true);
@@ -3049,19 +3067,20 @@ const QuizPage = ({ t }) => {
         }
     };
 
-    const handleAvatarUpload = (e) => {
+    const handleAvatarUpload = function (e) {
         const file = e.target.files[0];
+
         if (file) {
             setAvatar(file);
             const reader = new FileReader();
-            reader.onloadend = () => {
+            reader.onloadend = function () {
                 setAvatarPreview(reader.result);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const generateCertificate = () => {
+    const generateCertificate = function () {
         if (!username.trim()) {
             alert(quizT.usernameRequired);
             return;
@@ -3116,7 +3135,7 @@ const QuizPage = ({ t }) => {
             const word = words[i];
             const width = ctx.measureText(currentLine + " " + word).width;
             if (width < maxWidth) {
-                currentLine += " " + word;
+                currentLine = currentLine + " " + word;
             } else {
                 lines.push(currentLine);
                 currentLine = word;
@@ -3126,22 +3145,23 @@ const QuizPage = ({ t }) => {
 
         const startY = 350;
         const lineHeight = 45;
-        lines.forEach((line, index) => {
+
+        lines.forEach(function (line, index) {
             ctx.fillText(line, canvas.width / 2, startY + index * lineHeight);
         });
 
         ctx.fillStyle = '#FFD700';
         ctx.font = 'bold 36px Orbitron, sans-serif';
-        ctx.fillText(`${quizT.score.replace('{score}', score)}`, canvas.width / 2, 500);
+        ctx.fillText(quizT.score.replace('{score}', score), canvas.width / 2, 500);
 
         const date = new Date().toLocaleDateString(t.quizPage.title === "Квиз MagicBlock" ? 'ru-RU' : 'en-US');
         ctx.fillStyle = '#B8D972';
         ctx.font = '20px Inter, sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(`${quizT.date} ${date}`, 100, 650);
+        ctx.fillText(quizT.date + ' ' + date, 100, 650);
 
         ctx.textAlign = 'right';
-        ctx.fillText(`${quizT.signature} ${quizT.torSignature}`, canvas.width - 100, 650);
+        ctx.fillText(quizT.signature + ' ' + quizT.torSignature, canvas.width - 100, 650);
 
         ctx.textAlign = 'center';
         ctx.fillStyle = '#8B5CF6';
@@ -3150,7 +3170,7 @@ const QuizPage = ({ t }) => {
 
         if (avatarPreview) {
             const img = new Image();
-            img.onload = () => {
+            img.onload = function () {
                 ctx.save();
                 ctx.beginPath();
                 ctx.arc(150, 500, 50, 0, Math.PI * 2);
@@ -3161,56 +3181,58 @@ const QuizPage = ({ t }) => {
 
                 const certificateUrl = canvas.toDataURL('image/png');
                 const certData = {
-                    username,
-                    score,
-                    date,
-                    certificateUrl
+                    username: username,
+                    score: score,
+                    date: date,
+                    certificateUrl: certificateUrl
                 };
 
                 setCertificateData(certData);
-                localStorage.setItem(`magicblock_cert_${username}`, JSON.stringify(certData));
+                localStorage.setItem('magicblock_cert_' + username, JSON.stringify(certData));
                 setCertificateGenerated(true);
             };
             img.src = avatarPreview;
         } else {
             const certificateUrl = canvas.toDataURL('image/png');
             const certData = {
-                username,
-                score,
-                date,
-                certificateUrl
+                username: username,
+                score: score,
+                date: date,
+                certificateUrl: certificateUrl
             };
 
             setCertificateData(certData);
-            localStorage.setItem(`magicblock_cert_${username}`, JSON.stringify(certData));
+            localStorage.setItem('magicblock_cert_' + username, JSON.stringify(certData));
             setCertificateGenerated(true);
         }
     };
 
-    const downloadCertificate = () => {
+    const downloadCertificate = function () {
         if (certificateData) {
             const link = document.createElement('a');
             link.href = certificateData.certificateUrl;
-            link.download = `magicblock-certificate-${username}.png`;
+            link.download = 'magicblock-certificate-' + username + '.png';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
     };
 
-    const shareCertificate = () => {
+    const shareCertificate = function () {
         if (certificateData && navigator.share) {
             navigator.share({
-                title: `MagicBlock Certificate - ${username}`,
-                text: `I scored ${score}/10 on the MagicBlock quiz!`,
+                title: 'MagicBlock Certificate - ' + username,
+                text: 'I scored ' + score + '/10 on the MagicBlock quiz!',
                 url: certificateData.certificateUrl
+            }).catch(function (error) {
+                console.log('Error sharing:', error);
             });
         } else {
             downloadCertificate();
         }
     };
 
-    const resetQuiz = () => {
+    const resetQuiz = function () {
         setCurrentQuestion(0);
         setAnswers({});
         setQuizCompleted(false);
@@ -3238,11 +3260,14 @@ const QuizPage = ({ t }) => {
                         <div className="progress-bar">
                             <div
                                 className="progress-fill"
-                                style={{ width: `${progress}%` }}
+                                style={{ width: progress + '%' }}
                             ></div>
                         </div>
                         <div className="progress-text">
-                            {quizT.question.replace('{current}', currentQuestion + 1).replace('{total}', questions.length)}
+                            {quizT.question
+                                .replace('{current}', currentQuestion + 1)
+                                .replace('{total}', questions.length)
+                            }
                         </div>
                     </div>
 
@@ -3253,18 +3278,20 @@ const QuizPage = ({ t }) => {
                         </div>
 
                         <div className="options-grid">
-                            {currentQ.options.map((option, index) => (
-                                <button
-                                    key={index}
-                                    className={`option-btn ${answers[currentQ.id] === index ? 'selected' : ''}`}
-                                    onClick={() => handleAnswer(currentQ.id, index)}
-                                >
-                                    <span className="option-letter">
-                                        {String.fromCharCode(65 + index)}
-                                    </span>
-                                    <span className="option-text">{option}</span>
-                                </button>
-                            ))}
+                            {currentQ.options.map(function (option, index) {
+                                return (
+                                    <button
+                                        key={index}
+                                        className={`option-btn ${answers[currentQ.id] === index ? 'selected' : ''}`}
+                                        onClick={function () { handleAnswer(currentQ.id, index); }}
+                                    >
+                                        <span className="option-letter">
+                                            {String.fromCharCode(65 + index)}
+                                        </span>
+                                        <span className="option-text">{option}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
 
                         <div className="quiz-navigation">
@@ -3320,7 +3347,7 @@ const QuizPage = ({ t }) => {
                                         type="text"
                                         id="username"
                                         value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        onChange={function (e) { setUsername(e.target.value); }}
                                         placeholder="@yourname"
                                         className="username-input"
                                     />
@@ -3404,630 +3431,197 @@ const QuizPage = ({ t }) => {
             )}
         </div>
     );
-};
+}
 
-const PodiumCard = ({ player, getRankIcon, getScoreBadge, hallOfFame }) => {
-    const isRussian = hallOfFame.title === "Зал Славы MagicBlock Quiz";
+function HallOfFamePage({ t }) {
+    return <HallOfFame t={t} />;
+}
 
+function ValentineCreatorPage() {
     return (
-        <div className={`podium-card rank-${player.rank} ${player.isPlaceholder ? 'placeholder' : ''}`}>
-            <div className="podium-rank">
-                <span className="rank-icon-large">{getRankIcon(player.rank)}</span>
-            </div>
-
-            <div className="podium-avatar-container">
-                <img
-                    src={player.avatar}
-                    alt={player.username}
-                    className="podium-avatar"
-                    onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI1MCIgZmlsbD0iIzJBMkEyQSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjE1IiBmaWxsPSIjNEM0QzRDIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI3MCIgcj0iMjAiIGZpbGw9IiM0QzRDNEMiLz48dGV4dCB4PSI1MCIgeT0iNTUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZmlsbD0iI0ZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPj88L3RleHQ+PC9zdmc+";
-                    }}
-                />
-                {player.isPlaceholder && (
-                    <div className="placeholder-overlay">
-                        <span className="overlay-text">{isRussian ? "Свободно" : "Available"}</span>
-                    </div>
-                )}
-            </div>
-
-            <div className="podium-info">
-                <h3 className={`podium-username ${player.isPlaceholder ? 'placeholder' : ''}`}>
-                    {player.isPlaceholder ? (isRussian ? "Место свободно!" : "Spot Available!") : player.username}
-                </h3>
-                <div className="podium-score">
-                    {getScoreBadge(player.score, player.isPlaceholder)}
-                </div>
-                <div className="podium-meta">
-                    <span className="meta-item">📅 {player.date}</span>
-                    <span className="meta-item">⏰ {player.time}</span>
-                </div>
-            </div>
-
-            <button className="podium-action-btn disabled" disabled={player.isPlaceholder}>
-                {player.isPlaceholder ? (isRussian ? "Ожидаем участника" : "Waiting for participant") : hallOfFame.viewTwitter}
-            </button>
-
-            {player.isPlaceholder && (
-                <div className="placeholder-hint">
-                    <span className="hint-icon">👆</span>
-                    <span className="hint-text">{isRussian ? "Может быть вашим!" : "Could be yours!"}</span>
-                </div>
-            )}
+        <div className="valentine-main-container">
+            <CharacterCreator />
         </div>
     );
-};
+}
 
-// Выносим CategorySection за пределы HallOfFamePage
-const CategorySection = ({ title, players, icon, hallOfFame, getRankIcon, getScoreBadge, placesCount }) => {
-    const isRussian = hallOfFame.title === "Зал Славы MagicBlock Quiz";
-    const topThree = players.slice(0, 3);
-    const emptyPlaces = placesCount - players.filter(p => !p.isPlaceholder).length;
+function HubApp({ t, currentLang, setCurrentLang }) {
+    const [page, setPage] = useState('home');
+    const [showQuizBadge, setShowQuizBadge] = useState(true);
 
-    return (
-        <div className="hof-category-section hub-anim-reveal-up">
-            <h2 className="category-title">
-                <span className="category-icon">{icon}</span>
-                {title}
-                {emptyPlaces > 0 && (
-                    <span className="places-badge">{emptyPlaces} {isRussian ? "свободных мест" : "spots available"}</span>
-                )}
-            </h2>
-
-            <div className="category-description">
-                <p>
-                    {players.filter(p => !p.isPlaceholder).length === 0
-                        ? (isRussian
-                            ? "🎯 Здесь будут первые 3 участника, получивших этот результат. Места ждут своих героев!"
-                            : "🎯 Here will be the first 3 participants who achieved this result. Spots are waiting for their heroes!")
-                        : (isRussian
-                            ? "🏅 Топ-3 участников с лучшим результатом в этой категории"
-                            : "🏅 Top 3 participants with the best results in this category")
-                    }
-                </p>
-            </div>
-
-            {/* Пьедестал для топ-3 */}
-            <div className="category-podium">
-                {topThree.map((player) => (
-                    <div key={player.id} className={`category-podium-card rank-${player.rank} ${player.isPlaceholder ? 'placeholder' : ''}`}>
-                        <div className="podium-rank-small">
-                            <span className="rank-icon-small">{getRankIcon(player.rank)}</span>
-                        </div>
-                        <div className="podium-avatar-small">
-                            <img
-                                src={player.avatar}
-                                alt={player.username}
-                                className="avatar-small"
-                            />
-                            {player.isPlaceholder && (
-                                <div className="placeholder-indicator">?</div>
-                            )}
-                        </div>
-                        <div className="podium-info-small">
-                            <h4 className={player.isPlaceholder ? 'placeholder' : ''}>
-                                {player.isPlaceholder ? (isRussian ? "Свободно" : "Available") : player.username}
-                            </h4>
-                            <div className="score-small">
-                                {getScoreBadge(player.score, player.isPlaceholder)}
-                            </div>
-                            <div className="meta-small">
-                                <span>📅 {player.date}</span>
-                                <span>⏰ {player.time}</span>
-                            </div>
-                        </div>
-                        <button
-                            className="action-btn-small disabled"
-                            disabled={player.isPlaceholder}
-                            title={player.isPlaceholder ? (isRussian ? "Место свободно" : "Spot available") : hallOfFame.viewTwitter}
-                        >
-                            {player.isPlaceholder ? "?" : "👁️"}
-                        </button>
-                    </div>
-                ))}
-            </div>
-
-            {/* Сообщение для свободных мест */}
-            {players.filter(p => !p.isPlaceholder).length === 0 && (
-                <div className="empty-category-message">
-                    <div className="empty-icon">🎯</div>
-                    <h3>{isRussian ? "Эта категория пока пуста" : "This category is empty for now"}</h3>
-                    <p>{isRussian
-                        ? `Станьте первым, кто получит ${title.toLowerCase()} и займет почетное место на пьедестале!`
-                        : `Become the first to achieve ${title.toLowerCase()} and take a place on the podium!`
-                    }</p>
-                </div>
-            )}
-        </div>
-    );
-};
-
-const HallOfFamePage = ({ t }) => {
-    const hallOfFame = t.hallOfFamePage;
-    const [activeCategory, setActiveCategory] = useState('all');
-
-    // Определяем язык для условного рендеринга
-    const isRussian = t.hallOfFamePage.title === "Зал Славы MagicBlock Quiz";
-
-    // Демо-данные - будут заменены реальными
-    const playersData = {
-        // Первые 3 завершивших (любой результат)
-        firstCompleters: [
-            {
-                id: 1,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 0,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 1,
-                category: "first",
-                isPlaceholder: true
-            },
-            {
-                id: 2,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 0,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 2,
-                category: "first",
-                isPlaceholder: true
-            },
-            {
-                id: 3,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 0,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 3,
-                category: "first",
-                isPlaceholder: true
-            }
-        ],
-        // 10/10 участники
-        perfect10: [
-            {
-                id: 4,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 10,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 1,
-                category: "perfect10",
-                isPlaceholder: true
-            },
-            {
-                id: 5,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 10,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 2,
-                category: "perfect10",
-                isPlaceholder: true
-            },
-            {
-                id: 6,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 10,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 3,
-                category: "perfect10",
-                isPlaceholder: true
-            }
-        ],
-        // 9/10 участники
-        excellent9: [
-            {
-                id: 7,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 9,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 1,
-                category: "excellent9",
-                isPlaceholder: true
-            },
-            {
-                id: 8,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 9,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 2,
-                category: "excellent9",
-                isPlaceholder: true
-            },
-            {
-                id: 9,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 9,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 3,
-                category: "excellent9",
-                isPlaceholder: true
-            }
-        ],
-        // 8/10 участники
-        great8: [
-            {
-                id: 10,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 8,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 1,
-                category: "great8",
-                isPlaceholder: true
-            },
-            {
-                id: 11,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 8,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 2,
-                category: "great8",
-                isPlaceholder: true
-            },
-            {
-                id: 12,
-                username: isRussian ? "@место_свободно" : "@spot_available",
-                displayName: "???",
-                avatar: "/avatars/placeholder.jpg",
-                score: 8,
-                date: isRussian ? "--.--.----" : "--/--/----",
-                time: "--:--",
-                twitterPost: "#",
-                certificateUrl: "#",
-                rank: 3,
-                category: "great8",
-                isPlaceholder: true
-            }
-        ]
+    const handleLanguageChange = function (lang) {
+        setCurrentLang(lang);
+        localStorage.setItem('magicblock_lang', lang);
     };
 
-    const getRankIcon = (rank) => {
-        switch (rank) {
-            case 1: return "🥇";
-            case 2: return "🥈";
-            case 3: return "🥉";
-            default: return `#${rank}`;
+    const renderPageContent = function () {
+        switch (page) {
+            case 'home':
+                return (
+                    <HomePage
+                        setPage={setPage}
+                        t={t}
+                        showQuizBadge={showQuizBadge}
+                        setShowQuizBadge={setShowQuizBadge}
+                    />
+                );
+            case 'magicblock':
+                return <MagicBlockPage t={t} setPage={setPage} />;
+            case 'community':
+                return <CommunityPage t={t} />;
+            case 'news':
+                return <NewsPage t={t} />;
+            case 'about':
+                return <AboutPage t={t} />;
+            case 'media':
+                return <MediaPage t={t} />;
+            case 'quiz':
+                return <QuizPage t={t} />;
+            case 'halloffame':
+                return <HallOfFamePage t={t} />;
+            case 'valentine':
+                return <ValentineCreatorPage />;
+            default:
+                return (
+                    <HomePage
+                        setPage={setPage}
+                        t={t}
+                        showQuizBadge={showQuizBadge}
+                        setShowQuizBadge={setShowQuizBadge}
+                    />
+                );
         }
     };
 
-    const getScoreBadge = (score, isPlaceholder) => {
-        if (isPlaceholder) {
-            return <span className="score-badge placeholder">???</span>;
-        }
-        if (score === 10) return <span className="score-badge perfect">🏆 10/10</span>;
-        if (score === 9) return <span className="score-badge excellent">🥈 9/10</span>;
-        return <span className="score-badge great">🥉 8/10</span>;
-    };
+    const isFullscreenPage = page === 'valentine' || page === 'halloffame';
 
     return (
-        <div className="page hub-anim-fade-in">
-            <div className="hall-of-fame-header">
-                <h1>{hallOfFame.title}</h1>
-                <p className="hall-of-fame-subtitle">
-                    {hallOfFame.subtitle}
-                </p>
+        <div className="hub-shell">
+            <HubBackground />
 
-                {/* Баннер с предупреждением */}
-                <div className="demo-banner hub-anim-reveal-up">
-                    <div className="demo-banner-content">
-                        <span className="banner-icon">⚠️</span>
-                        <div className="banner-text">
-                            <strong>{isRussian ? "Внимание:" : "Attention:"}</strong> {isRussian
-                                ? "Это демонстрационные данные. Все места свободны! Первые участники появятся здесь после начала челленджа."
-                                : "This is demo data. All spots are available! First participants will appear here after the challenge starts."
-                            }
-                        </div>
-                    </div>
-                </div>
+            <div className="lang-switcher">
+                <button
+                    className={`lang-btn ${currentLang === 'ru' ? 'active' : ''}`}
+                    onClick={function () { handleLanguageChange('ru'); }}
+                >
+                    🇷🇺 RU
+                </button>
+                <button
+                    className={`lang-btn ${currentLang === 'en' ? 'active' : ''}`}
+                    onClick={function () { handleLanguageChange('en'); }}
+                >
+                    🇺🇸 EN
+                </button>
             </div>
 
-            {/* Статистика с пометкой "демо" */}
-            <div className="hof-stats-demo hub-anim-reveal-up" style={{ animationDelay: '0.1s' }}>
-                <div className="stat-card demo">
-                    <div className="stat-icon">👥</div>
-                    <div className="stat-content">
-                        <h3>0</h3>
-                        <p>{hallOfFame.totalPlayers}</p>
-                        <span className="demo-badge">{isRussian ? "Ожидаем участников" : "Waiting for participants"}</span>
-                    </div>
+            <nav className="navbar">
+                <div className="nav-brand" onClick={function () { setPage('home'); }}>
+                    <img src={MB_LOGO} alt="MB" />
+                    <span>{t.hubTitle}</span>
                 </div>
-                <div className="stat-card demo">
-                    <div className="stat-icon">📊</div>
-                    <div className="stat-content">
-                        <h3>0.0</h3>
-                        <p>{hallOfFame.averageScore}</p>
-                        <span className="demo-badge">{isRussian ? "Пока нет данных" : "No data yet"}</span>
-                    </div>
+
+                <div className="nav-links">
+                    <button
+                        onClick={function () { setPage('home'); }}
+                        className={page === 'home' ? 'active' : ''}
+                    >
+                        {t.home}
+                    </button>
+
+                    <button
+                        onClick={function () { setPage('valentine'); }}
+                        className={page === 'valentine' ? 'active' : ''}
+                    >
+                         {t.valentineTab || "Valentine Maker"}
+                    </button>
+
+                    <button
+                        onClick={function () { setPage('magicblock'); }}
+                        className={page === 'magicblock' ? 'active' : ''}
+                    >
+                        {t.project}
+                    </button>
+                    <button
+                        onClick={function () { setPage('community'); }}
+                        className={page === 'community' ? 'active' : ''}
+                    >
+                        {t.community}
+                    </button>
+                    <button
+                        onClick={function () { setPage('news'); }}
+                        className={page === 'news' ? 'active' : ''}
+                    >
+                        {t.news}
+                    </button>
+                    <button
+                        onClick={function () { setPage('media'); }}
+                        className={page === 'media' ? 'active' : ''}
+                    >
+                        {t.media}
+                    </button>
+               
+                 
                 </div>
-                <div className="stat-card demo">
-                    <div className="stat-icon">🏆</div>
-                    <div className="stat-content">
-                        <h3>0</h3>
-                        <p>{isRussian ? "Свободных мест" : "Available spots"}</p>
-                        <span className="demo-badge">12 {isRussian ? "мест ждут вас!" : "spots waiting for you!"}</span>
-                    </div>
+
+                <div className="nav-profile" onClick={function () { setPage('about'); }}>
+                    <span>{t.torName}</span>
+                    <img src={AVATAR} alt="Tor" />
                 </div>
+            </nav>
+
+            <div className={`content-wrapper ${isFullscreenPage ? 'fullscreen-content' : 'standard-content'}`}>
+                {renderPageContent()}
             </div>
 
-            {/* Фильтры по категориям */}
-            <div className="hof-category-filters hub-anim-reveal-up" style={{ animationDelay: '0.2s' }}>
-                <div className="filter-buttons">
-                    <button
-                        className={`category-filter-btn ${activeCategory === 'all' ? 'active' : ''}`}
-                        onClick={() => setActiveCategory('all')}
+            <footer className="footer">
+                <div className="footer-content">
+                    <p>{t.footerText}</p>
+                    <a
+                        href="https://x.com/cryptoo_tor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="twitter-link"
+                        title={t.twitterLink}
                     >
-                        <span className="filter-icon">🏆</span>
-                        {hallOfFame.allScores}
-                    </button>
-                    <button
-                        className={`category-filter-btn ${activeCategory === 'first' ? 'active' : ''}`}
-                        onClick={() => setActiveCategory('first')}
-                    >
-                        <span className="filter-icon">🚀</span>
-                        {hallOfFame.firstCompleters}
-                    </button>
-                    <button
-                        className={`category-filter-btn ${activeCategory === 'perfect10' ? 'active' : ''}`}
-                        onClick={() => setActiveCategory('perfect10')}
-                    >
-                        <span className="filter-icon">🏆</span>
-                        {hallOfFame.score10}
-                    </button>
-                    <button
-                        className={`category-filter-btn ${activeCategory === 'excellent9' ? 'active' : ''}`}
-                        onClick={() => setActiveCategory('excellent9')}
-                    >
-                        <span className="filter-icon">🥈</span>
-                        {hallOfFame.score9}
-                    </button>
-                    <button
-                        className={`category-filter-btn ${activeCategory === 'great8' ? 'active' : ''}`}
-                        onClick={() => setActiveCategory('great8')}
-                    >
-                        <span className="filter-icon">🥉</span>
-                        {hallOfFame.score8}
-                    </button>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+                        </svg>
+                        <span>{t.twitterLink}</span>
+                    </a>
                 </div>
-            </div>
-
-            {/* Пьедесталы для первых завершивших */}
-            {(activeCategory === 'all' || activeCategory === 'first') && (
-                <div className="hof-podiums-section hub-anim-reveal-up" style={{ animationDelay: '0.3s' }}>
-                    <h2 className="podiums-title">
-                        <span className="title-icon">🚀</span>
-                        {hallOfFame.firstCompleters}
-                        <span className="places-badge">3 {isRussian ? "свободных места" : "spots available"}</span>
-                    </h2>
-
-                    <div className="podiums-container">
-                        {playersData.firstCompleters.map((player) => (
-                            <PodiumCard
-                                key={player.id}
-                                player={player}
-                                getRankIcon={getRankIcon}
-                                getScoreBadge={getScoreBadge}
-                                hallOfFame={hallOfFame}
-                            />
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {/* Категории по очкам */}
-            {(activeCategory === 'all' || activeCategory === 'perfect10') && (
-                <CategorySection
-                    title={hallOfFame.score10}
-                    players={playersData.perfect10}
-                    icon="🏆"
-                    hallOfFame={hallOfFame}
-                    getRankIcon={getRankIcon}
-                    getScoreBadge={getScoreBadge}
-                    placesCount={3}
-                />
-            )}
-
-            {(activeCategory === 'all' || activeCategory === 'excellent9') && (
-                <CategorySection
-                    title={hallOfFame.score9}
-                    players={playersData.excellent9}
-                    icon="🥈"
-                    hallOfFame={hallOfFame}
-                    getRankIcon={getRankIcon}
-                    getScoreBadge={getScoreBadge}
-                    placesCount={3}
-                />
-            )}
-
-            {(activeCategory === 'all' || activeCategory === 'great8') && (
-                <CategorySection
-                    title={hallOfFame.score8}
-                    players={playersData.great8}
-                    icon="🥉"
-                    hallOfFame={hallOfFame}
-                    getRankIcon={getRankIcon}
-                    getScoreBadge={getScoreBadge}
-                    placesCount={3}
-                />
-            )}
-
-            {/* Как попасть в зал славы */}
-            <div className="hof-how-to-join hub-anim-reveal-up" style={{ animationDelay: '0.6s' }}>
-                <div className="how-to-card">
-                    <h3>🎯 {isRussian ? "Как занять место в Зале Славы?" : "How to get a spot in the Hall of Fame?"}</h3>
-
-                    <div className="steps-container">
-                        <div className="step">
-                            <div className="step-header">
-                                <span className="step-number">1</span>
-                                <h4>{isRussian ? "Пройти квиз MagicBlock" : "Take the MagicBlock Quiz"}</h4>
-                            </div>
-                            <p>{isRussian
-                                ? "Ответьте на 10 вопросов о MagicBlock на странице квиза"
-                                : "Answer 10 questions about MagicBlock on the quiz page"
-                            }</p>
-                        </div>
-
-                        <div className="step">
-                            <div className="step-header">
-                                <span className="step-number">2</span>
-                                <h4>{isRussian ? "Получить сертификат" : "Get your certificate"}</h4>
-                            </div>
-                            <p>{isRussian
-                                ? "Правильно ответьте минимум на 8 вопросов для получения сертификата"
-                                : "Answer at least 8 questions correctly to get your certificate"
-                            }</p>
-                        </div>
-
-                        <div className="step">
-                            <div className="step-header">
-                                <span className="step-number">3</span>
-                                <h4>{isRussian ? "Поделиться в Twitter" : "Share on Twitter"}</h4>
-                            </div>
-                    
-
-                            {/* Кнопка с ссылкой на твит */}
-                            <div className="twitter-action-section">
-                                <p className="twitter-instruction">
-                                    <strong>📌 {isRussian ? "ВАЖНО:" : "IMPORTANT:"}</strong> {isRussian
-                                        ? "Сделайте quote retweet (цитатный ретвит) этого поста с вашим сертификатом и отметьте меня @cryptoo_tor"
-                                        : "Make a quote retweet of this post with your certificate and mention me @cryptoo_tor"
-                                    }
-                                </p>
-
-                                <a
-                                    href="https://x.com/cryptoo_tor/status/your-post-id"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="twitter-quote-button"
-                                >
-                                    <span className="button-icon">🔗</span>
-                                    <span className="button-text">{isRussian ? "Ссылка на пост для quote retweet" : "Link for quote retweet"}</span>
-                                    <span className="button-arrow">→</span>
-                                </a>
-
-                               
-                            </div>
-                        </div>
-
-                        <div className="step">
-                            <div className="step-header">
-                                <span className="step-number">4</span>
-                                <h4>{isRussian ? "Попасть в таблицу" : "Get on the leaderboard"}</h4>
-                            </div>
-                            <p>{isRussian
-                                ? "Я добавлю вас в таблицу лидеров после проверки вашего поста"
-                                : "I'll add you to the leaderboard after verifying your post"
-                            }</p>
-                        </div>
-                    </div>
-
-                    <div className="important-note">
-                        <span className="note-icon">💡</span>
-                        <div className="note-content">
-                            <strong>{isRussian ? "Важно:" : "Important:"}</strong> {isRussian
-                                ? "Места распределяются по времени публикации в Twitter. Чем раньше вы поделитесь результатом, тем выше ваш шанс попасть в топ-3 своей категории!"
-                                : "Spots are allocated based on Twitter post time. The earlier you share your result, the higher your chance of getting into the top 3 of your category!"
-                            }
-                        </div>
-                    </div>
-
-                    <div className="cta-section">
-                        <p className="cta-text">🎁 <strong>{isRussian ? "Первые 12 участников" : "First 12 participants"}</strong> {isRussian
-                            ? "получат особое признание в сообществе!"
-                            : "will receive special recognition in the community!"
-                        }</p>
-                        <a
-                            href="#quiz"
-                            className="cta-button"
-                            onClick={(e) => {
-                                e.preventDefault();
-                                // Здесь можно добавить навигацию на страницу квиза
-                                window.location.hash = 'quiz';
-                            }}
-                        >
-                            🚀 {isRussian ? "Пройти квиз сейчас!" : "Take the quiz now!"}
-                        </a>
-                    </div>
-                </div>
-            </div>
+            </footer>
         </div>
     );
-};
+}
 
 export default function App() {
     const [currentLang, setCurrentLang] = useState(null);
     const [languageSelected, setLanguageSelected] = useState(false);
 
-    useEffect(() => {
+    useEffect(function () {
         const savedLang = localStorage.getItem('magicblock_lang');
+
         if (savedLang && (savedLang === 'ru' || savedLang === 'en')) {
-            setTimeout(() => {
+            setTimeout(function () {
                 setCurrentLang(savedLang);
                 setLanguageSelected(true);
             }, 0);
         }
     }, []);
 
+    const handleLanguageSelect = function (lang) {
+        setCurrentLang(lang);
+        setLanguageSelected(true);
+    };
+
     const t = currentLang ? translations[currentLang] : translations.ru;
 
     if (!languageSelected) {
-        return <LanguageSelector onLanguageSelect={(lang) => {
-            setCurrentLang(lang);
-            setLanguageSelected(true);
-        }} />;
+        return (
+            <LanguageSelector
+                onLanguageSelect={handleLanguageSelect}
+            />
+        );
     }
 
     return (
