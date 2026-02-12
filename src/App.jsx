@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './styles/hub-styles.css';
 import './HallOfFame.css';
 import CharacterCreator from './CharacterCreator';
@@ -650,7 +650,7 @@ function HubBackground() {
     );
 }
 
-function HomePage({ setPage, t,  setShowQuizBadge }) {
+function HomePage({ setPage, t, setShowQuizBadge }) {
     return (
         <div className="page hub-anim-fade-in">
             <div className="intro-grid">
@@ -707,9 +707,11 @@ function HomePage({ setPage, t,  setShowQuizBadge }) {
                             borderRadius: '50px',
                             fontSize: '14px',
                             fontWeight: 'bold',
-                            color: 'white'
+                            color: 'white',
+                            whiteSpace: 'nowrap', // Запрещает перенос текста
+                            display: 'inline-block' // Обеспечивает работу whiteSpace
                         }}>
-                            🎉 VALENTINE'S DAY
+                            VALENTINE'S DAY
                         </span>
                     </div>
                 </div>
@@ -770,7 +772,7 @@ function HomePage({ setPage, t,  setShowQuizBadge }) {
                             e.currentTarget.style.boxShadow = '0 5px 20px rgba(255, 215, 0, 0.4)';
                         }}
                     >
-                        <span style={{ fontSize: '24px' }}>🎨</span>
+                        <span style={{ fontSize: '24px' }}></span>
                         {t.quizPage.title === "Квиз MagicBlock" ? "Создать валентинку" : "Create Valentine"}
                         <span style={{ fontSize: '20px' }}>→</span>
                     </button>
@@ -3530,7 +3532,7 @@ function HubApp({ t, currentLang, setCurrentLang }) {
                         onClick={function () { setPage('valentine'); }}
                         className={page === 'valentine' ? 'active' : ''}
                     >
-                         {t.valentineTab || "Valentine Maker"}
+                        {t.valentineTab || "Valentine Maker"}
                     </button>
 
                     <button
@@ -3557,8 +3559,8 @@ function HubApp({ t, currentLang, setCurrentLang }) {
                     >
                         {t.media}
                     </button>
-               
-                 
+
+
                 </div>
 
                 <div className="nav-profile" onClick={function () { setPage('about'); }}>
