@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import './CharacterCreator.css';
 
 // === CONSTANTS ===
-const EXPORT_W = 990;
-const EXPORT_H = 594;
+// Разрешение экспорта: 1980×1188 (2× от оригинальных 990×594, соотношение 5:3)
+// Все координаты в drawLayer/drawTexts считаются в % от этих значений —
+// масштабируется автоматически без правок логики.
+const EXPORT_W = 1980;
+const EXPORT_H = 1188;
 const PREVIEW_AR = EXPORT_W / EXPORT_H;
 
 const ASSETS = {
@@ -95,30 +98,10 @@ const CharacterCreator = () => {
     const wrapperRef = useRef(null);
 
     useEffect(() => {
-        // Сохраняем текущую позицию
-        const scrollY = window.scrollY;
-
-        // Фиксируем body и сбрасываем скролл
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${scrollY}px`;
-        document.body.style.left = '0';
-        document.body.style.right = '0';
-        document.body.style.overflow = 'hidden';
-        document.body.style.width = '100%';
-        document.body.style.height = '100%';
-
-        // Находим и убиваем скролл у всех родительских контейнеров
-        let parent = wrapperRef.current?.parentElement;
-        while (parent) {
-            parent.style.overflow = 'hidden';
-            parent.style.overflowY = 'hidden';
-            parent.style.overflowX = 'hidden';
-            parent = parent.parentElement;
-        }
-
         const applyZoom = () => {
             if (!wrapperRef.current) return;
 
+            // Читаем --dpr-scale из #dpr-scale-root если он есть
             const root = document.getElementById('dpr-scale-root');
             let dprScale = 1;
 
@@ -127,43 +110,29 @@ const CharacterCreator = () => {
                 const parsed = parseFloat(val);
                 if (!isNaN(parsed) && parsed > 0) dprScale = parsed;
             } else {
+                // Fallback: считаем сами из devicePixelRatio
+                // Стандартный DPR при 100% = 1, при 150% = 1.5
+                // hub компенсирует его как 1/dpr, мы делаем обратное
                 const dpr = window.devicePixelRatio || 1;
+                // Округляем до стандартных шагов: 1, 1.25, 1.5, 1.75, 2
                 const steps = [1, 1.25, 1.5, 1.75, 2];
                 const nearest = steps.reduce((a, b) =>
                     Math.abs(b - dpr) < Math.abs(a - dpr) ? b : a
                 );
+                // dpr-scale-root делает scale(1/nearest), мы компенсируем
                 dprScale = 1 / nearest;
             }
 
+            // zoom = 1/dprScale нейтрализует родительский transform: scale(dprScale)
             const zoom = dprScale === 1 ? 1 : (1 / dprScale);
             wrapperRef.current.style.zoom = zoom === 1 ? '' : String(zoom);
         };
 
         applyZoom();
+
+        // Следим за изменением масштаба (resize тоже срабатывает при Ctrl+/-)
         window.addEventListener('resize', applyZoom);
-
-        return () => {
-            // Возвращаем скролл обратно
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            document.body.style.right = '';
-            document.body.style.overflow = '';
-            document.body.style.width = '';
-            document.body.style.height = '';
-
-            window.scrollTo(0, scrollY);
-
-            let parent = wrapperRef.current?.parentElement;
-            while (parent) {
-                parent.style.overflow = '';
-                parent.style.overflowY = '';
-                parent.style.overflowX = '';
-                parent = parent.parentElement;
-            }
-
-            window.removeEventListener('resize', applyZoom);
-        };
+        return () => window.removeEventListener('resize', applyZoom);
     }, []);
 
     // ─── Handlers ────────────────────────────────────────────────────────────
@@ -171,7 +140,7 @@ const CharacterCreator = () => {
     const handleMessageChange = (e) => {
         const val = e.target.value;
         if (val.split('\n').length > 6) return;
-        if (val.length > 120) return;  // ~20 символов × 6 строк
+        if (val.length > 45) return;
         setMessage(val);
     };
 
@@ -265,7 +234,7 @@ const CharacterCreator = () => {
             // height: 80%, top: 10%, left: 19%
             const h = H * 0.80;
             const w = (img.naturalWidth / img.naturalHeight) * h;
-            const x = W * 0.23;
+            const x = W * 0.235;
             const y = H * 0.10;
             ctx.drawImage(img, x, y, w, h);
         }
@@ -344,46 +313,12 @@ const CharacterCreator = () => {
         ctx.fillStyle = '#c71585';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-
-        // Разбиваем текст на строки с word-wrap:
-        // 1) Пользователь мог нажать Enter — это явные переносы
-        // 2) Внутри каждой строки слова переносятся если не влезают в taW
-        const padding = W * 0.015;
-        const maxLineW = taW - padding * 2;
-
-        const wrapLine = (rawLine) => {
-            const words = rawLine.split(' ');
-            const wrapped = [];
-            let current = '';
-            for (const word of words) {
-                const test = current ? current + ' ' + word : word;
-                if (ctx.measureText(test).width > maxLineW && current) {
-                    wrapped.push(current);
-                    current = word;
-                } else {
-                    current = test;
-                }
-            }
-            if (current) wrapped.push(current);
-            return wrapped.length ? wrapped : [''];
-        };
-
-        const userLines = (message || '').split('\n');
-        const allLines = userLines.flatMap(wrapLine);
-
-        // Клиппируем рисование строго внутри рамки textarea
-        ctx.save();
-        ctx.beginPath();
-        ctx.roundRect(taX, taY, taW, taH, 16);
-        ctx.clip();
-
-        const totalTextH = allLines.length * lineH;
-        const textStartY = taY + Math.max(padding, (taH - totalTextH) / 2);
-        allLines.forEach((line, i) => {
+        const lines = (message || '').split('\n');
+        const totalTextH = lines.length * lineH;
+        const textStartY = taY + (taH - totalTextH) / 2;
+        lines.forEach((line, i) => {
             ctx.fillText(line, taX + taW / 2, textStartY + i * lineH);
         });
-
-        ctx.restore();
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
     };
@@ -394,7 +329,8 @@ const CharacterCreator = () => {
      */
     const buildCanvas = async () => {
         // Убеждаемся что шрифт загружен, иначе canvas нарисует его дефолтным
-        await document.fonts.load(`22px 'Indie Flower'`);
+        const fontSizePx = Math.round(EXPORT_W * 0.022); // масштабируется с разрешением
+        await document.fonts.load(`${fontSizePx}px 'Indie Flower'`);
 
         const canvas = document.createElement('canvas');
         canvas.width = EXPORT_W;
@@ -447,7 +383,7 @@ const CharacterCreator = () => {
 
             try {
                 await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-                alert('✅ The image has been copied!\n\nTwitter will open — press Ctrl+V (Cmd+V) to paste.');
+                alert('✅ Изображение скопировано!\n\nTwitter откроется — нажми Ctrl+V (Cmd+V) чтобы вставить.');
             } catch {
                 // Clipboard API недоступен — скачиваем
                 const url = URL.createObjectURL(blob);
@@ -456,11 +392,11 @@ const CharacterCreator = () => {
                 link.href = url;
                 link.click();
                 URL.revokeObjectURL(url);
-                alert('📥 Image downloaded!\n\nTwitter will open — attach the file manually.');
+                alert('📥 Изображение скачано!\n\nTwitter откроется — прикрепи файл вручную.');
             }
 
             setTimeout(() => {
-                const text = encodeURIComponent("A little magic for Valentine’s Day 💘༉‧₊˚.\n\nMade with The @magicblock Valentine Creator\n\nby @cryptoo_tor & @wtf4uk\n\nBuild yours → https://magichub-nine.vercel.app");
+                const text = encodeURIComponent("💕 Happy Valentine's Day! 💕\n\nMade with Valentine Card Creator\n@cryptoo_tor @wtf4uk");
                 window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
             }, 1000);
         } catch (err) {
@@ -563,7 +499,6 @@ const CharacterCreator = () => {
                                     onChange={handleMessageChange}
                                     placeholder="Write your message…"
                                     rows={6}
-                                    maxLength={120}
                                     style={{ overflow: 'hidden', resize: 'none' }}
                                 />
                             </div>
