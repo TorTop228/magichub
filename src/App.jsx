@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './styles/hub-styles.css';
 import './HallOfFame.css';
-//import html2canvas from 'html2canvas';
+import * as html2canvas from 'html2canvas';
 import CharacterCreator from './CharacterCreator';
 import HallOfFame from './HallOfFame';
 const AVATAR = "/QXbbs7jJ_400x400.jpg";
